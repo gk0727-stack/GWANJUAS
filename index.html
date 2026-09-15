@@ -55,26 +55,26 @@
     background:var(--panel); flex-wrap:wrap;
   }
   .header-left{ display:flex; align-items:baseline; gap:12px; min-width:0; flex-wrap:wrap; }
-  .header-left h1{ font-size:17px; font-weight:700; letter-spacing:-0.2px; white-space:nowrap; color:var(--text); }
+  .header-left h1{ font-size:21px; font-weight:800; letter-spacing:-0.2px; white-space:nowrap; color:var(--text); }
   .site-name-input{
     background:transparent; border:none; border-bottom:1px solid transparent;
-    color:var(--text-muted); font-size:13px; padding:2px 0; min-width:80px; max-width:220px;
+    color:var(--text-muted); font-size:15px; padding:2px 0; min-width:80px; max-width:220px;
   }
   .site-name-input:hover, .site-name-input:focus{ border-bottom:1px solid var(--border); outline:none; color:var(--text); }
   .header-right{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .date-nav{
     display:flex; align-items:center; gap:4px; background:var(--panel-2);
-    border:1px solid var(--border); border-radius:8px; padding:4px;
+    border:1px solid var(--border); border-radius:10px; padding:5px;
   }
   .date-nav button{
-    background:none; border:none; color:var(--text-muted); width:26px; height:26px;
-    border-radius:6px; font-size:14px; display:flex; align-items:center; justify-content:center;
+    background:none; border:none; color:var(--text-muted); width:34px; height:34px;
+    border-radius:8px; font-size:18px; display:flex; align-items:center; justify-content:center;
   }
   .date-nav button:hover{ background:var(--border); color:var(--text); }
-  .date-nav input[type=date]{ background:none; border:none; color:var(--text); font-size:13px; padding:2px 4px; color-scheme:light; }
+  .date-nav input[type=date]{ background:none; border:none; color:var(--text); font-size:16px; padding:4px 6px; color-scheme:light; }
   .btn{
-    border:1px solid var(--border); background:var(--panel); color:var(--text);
-    padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500;
+    border:1.5px solid var(--border); background:var(--panel); color:var(--text);
+    padding:10px 16px; border-radius:10px; font-size:15px; font-weight:600;
     display:flex; align-items:center; gap:6px; transition:background .15s, border-color .15s;
     white-space:nowrap;
   }
@@ -88,9 +88,9 @@
 
   /* ---------- Stats strip ---------- */
   .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border-bottom:1px solid var(--border); }
-  .stat-card{ background:var(--panel); padding:12px 20px; display:flex; flex-direction:column; gap:2px; }
-  .stat-card .num{ font-size:24px; font-weight:800; letter-spacing:-0.5px; line-height:1.1; color:var(--text); }
-  .stat-card .label{ font-size:12px; color:var(--text-muted); font-weight:500; }
+  .stat-card{ background:var(--panel); padding:16px 20px; display:flex; flex-direction:column; gap:3px; }
+  .stat-card .num{ font-size:32px; font-weight:800; letter-spacing:-0.5px; line-height:1.1; color:var(--text); }
+  .stat-card .label{ font-size:14px; color:var(--text-muted); font-weight:600; }
   .stat-card.high .num{ color:var(--high); }
   .stat-card.mid .num{ color:var(--mid); }
   .stat-card.low .num{ color:var(--low); }
@@ -109,44 +109,44 @@
   .map-canvas{ position:relative; width:100%; height:100%; }
   .map-canvas img{ display:block; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-drag:none; }
   .map-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-  .empty-box{ text-align:center; padding:40px; max-width:360px; }
-  .empty-box .icon{ font-size:34px; margin-bottom:14px; opacity:0.5; }
-  .empty-box h3{ font-size:15px; font-weight:600; margin-bottom:6px; color:var(--text); }
-  .empty-box p{ font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:18px; }
+  .empty-box{ text-align:center; padding:40px; max-width:400px; }
+  .empty-box .icon{ font-size:40px; margin-bottom:16px; opacity:0.5; }
+  .empty-box h3{ font-size:19px; font-weight:800; margin-bottom:8px; color:var(--text); }
+  .empty-box p{ font-size:15px; color:var(--text-muted); line-height:1.7; margin-bottom:20px; }
 
   .map-toolbar{ position:absolute; top:14px; right:14px; display:flex; gap:8px; z-index:20; }
   .place-hint{
     position:absolute; top:14px; left:14px; background:var(--accent-bg);
-    border:1px solid var(--accent); color:#1D4ED8; font-size:12px; font-weight:500;
-    padding:7px 12px; border-radius:8px; z-index:30; display:none; box-shadow:var(--shadow-sm);
+    border:1.5px solid var(--accent); color:#1D4ED8; font-size:14.5px; font-weight:600;
+    padding:9px 14px; border-radius:9px; z-index:30; display:none; box-shadow:var(--shadow-sm);
   }
   .place-hint.show{ display:block; }
 
   .legend{
     position:absolute; bottom:14px; left:14px; background:var(--panel);
-    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
-    display:flex; gap:16px; font-size:12px; color:var(--text-muted); z-index:20;
-    box-shadow:var(--shadow-sm);
+    border:1px solid var(--border); border-radius:10px; padding:11px 16px;
+    display:flex; gap:16px; font-size:14px; font-weight:500; color:var(--text-muted); z-index:20;
+    box-shadow:var(--shadow-sm); flex-wrap:wrap; max-width:calc(100% - 28px);
   }
-  .legend span{ display:flex; align-items:center; gap:6px; }
-  .legend .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .legend span{ display:flex; align-items:center; gap:7px; }
+  .legend .dot{ width:11px; height:11px; border-radius:50%; display:inline-block; }
 
   /* ---------- Pins ---------- */
   .pin{ position:absolute; transform:translate(-50%,-50%); z-index:10; cursor:pointer; }
   .pin-circle{
-    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:13px; font-weight:700; color:#fff; border:2.5px solid #fff;
-    box-shadow:0 2px 8px rgba(16,24,40,0.28);
+    width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:19px; font-weight:800; color:#fff; border:3.5px solid #fff;
+    box-shadow:0 3px 10px rgba(16,24,40,0.35);
   }
   .pin.has-warn::before{
-    content:""; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--high);
+    content:""; position:absolute; inset:-8px; border-radius:50%; border:3px solid var(--high);
     animation:pulse 1.8s ease-out infinite;
   }
   @keyframes pulse{ 0%{ transform:scale(0.85); opacity:0.9; } 100%{ transform:scale(1.6); opacity:0; } }
   .pin-label{
-    position:absolute; top:42px; left:50%; transform:translateX(-50%);
-    background:var(--text); border:1px solid var(--text); padding:2px 7px;
-    border-radius:5px; font-size:11px; white-space:nowrap; color:#fff;
+    position:absolute; top:60px; left:50%; transform:translateX(-50%);
+    background:var(--text); border:1px solid var(--text); padding:4px 10px;
+    border-radius:6px; font-size:14px; font-weight:600; white-space:nowrap; color:#fff;
     pointer-events:none; opacity:0; transition:opacity .12s;
   }
   .pin:hover .pin-label{ opacity:1; }
@@ -164,33 +164,47 @@
   .zone-dot:hover .pin-label{ opacity:1; }
 
   .place-cursor .map-canvas{ cursor:crosshair; }
+  .area-drawing .map-canvas{ cursor:crosshair; }
+
+  .area-draw-rect{
+    position:absolute; border:2.5px dashed var(--accent); background:rgba(37,99,235,0.18);
+    pointer-events:none; z-index:16; border-radius:3px;
+  }
+  .area-overlay{
+    position:absolute; border-width:2.5px; border-style:solid; border-radius:4px;
+    pointer-events:none; z-index:6;
+  }
 
   /* ---------- Sidebar ---------- */
   .sidebar{
     flex:0 0 32%; max-width:400px; min-width:280px; border-left:1px solid var(--border);
     background:var(--panel); display:flex; flex-direction:column; min-height:0;
   }
-  .sidebar-head{ padding:14px 16px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .sidebar-head h2{ font-size:14px; font-weight:700; color:var(--text); }
-  .sidebar-head .count{ font-size:12px; color:var(--text-muted); }
-  .sidebar-list{ flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px; }
-  .sidebar-empty{ padding:40px 20px; text-align:center; color:var(--text-dim); font-size:13px; line-height:1.7; }
+  .sidebar-head{ padding:16px 18px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .sidebar-head h2{ font-size:17px; font-weight:800; color:var(--text); }
+  .sidebar-head .count{ font-size:14px; color:var(--text-muted); font-weight:600; }
+  .sidebar-list{ flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; }
+  .sidebar-empty{ padding:40px 20px; text-align:center; color:var(--text-dim); font-size:15px; line-height:1.8; }
   .work-card{
-    background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--text-dim);
-    border-radius:8px; padding:11px 13px; cursor:pointer; transition:border-color .12s, background .12s, box-shadow .12s;
+    background:var(--panel); border:1px solid var(--border); border-left:4px solid var(--text-dim);
+    border-radius:10px; padding:14px 16px; cursor:pointer; transition:border-color .12s, background .12s, box-shadow .12s;
   }
   .work-card:hover{ background:var(--panel-2); box-shadow:var(--shadow-sm); }
   .work-card[data-risk="high"]{ border-left-color:var(--high); }
   .work-card[data-risk="mid"]{ border-left-color:var(--mid); }
   .work-card[data-risk="low"]{ border-left-color:var(--low); }
-  .work-card-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
-  .work-card-top .badge{ font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:20px; }
+  .work-card-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; gap:8px; }
+  .work-card-top .badges-group{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .work-card-top .badge{ font-size:12.5px; font-weight:700; padding:3px 9px; border-radius:20px; }
   .badge.high{ background:var(--high-bg); color:var(--high); }
   .badge.mid{ background:var(--mid-bg); color:var(--mid); }
   .badge.low{ background:var(--low-bg); color:var(--low); }
-  .work-card-top .time{ font-size:11px; color:var(--text-dim); }
-  .work-card h4{ font-size:13.5px; font-weight:600; margin-bottom:3px; color:var(--text); }
-  .work-card .meta{ font-size:12px; color:var(--text-muted); display:flex; gap:10px; flex-wrap:wrap; }
+  .badge.inprogress{ background:var(--accent-bg); color:var(--accent); }
+  .badge.done{ background:var(--low-bg); color:var(--low); }
+  .btn.status-done{ background:var(--low-bg); border-color:var(--low); color:var(--low); }
+  .work-card-top .time{ font-size:13px; color:var(--text-dim); font-weight:500; }
+  .work-card h4{ font-size:16px; font-weight:700; margin-bottom:4px; color:var(--text); }
+  .work-card .meta{ font-size:14px; color:var(--text-muted); display:flex; gap:10px; flex-wrap:wrap; }
   .work-card .loc{ color:var(--accent); font-weight:600; }
 
   /* ---------- Modal generic ---------- */
@@ -204,19 +218,19 @@
     width:100%; max-width:400px; padding:22px; max-height:90vh; overflow-y:auto; position:relative;
     box-shadow:var(--shadow-md);
   }
-  .modal h3{ font-size:15px; font-weight:700; margin-bottom:16px; padding-right:24px; color:var(--text); }
-  .field{ margin-bottom:13px; }
-  .field label{ display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px; font-weight:500; }
+  .modal h3{ font-size:19px; font-weight:800; margin-bottom:18px; padding-right:24px; color:var(--text); }
+  .field{ margin-bottom:15px; }
+  .field label{ display:block; font-size:14px; color:var(--text-muted); margin-bottom:6px; font-weight:600; }
   .field input[type=text], .field input[type=number], .field input[type=time], .field textarea, .field select{
-    width:100%; background:var(--panel-2); border:1px solid var(--border); border-radius:7px;
-    padding:9px 11px; color:var(--text); font-size:13px;
+    width:100%; background:var(--panel-2); border:1.5px solid var(--border); border-radius:8px;
+    padding:12px 13px; color:var(--text); font-size:16px;
   }
   .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--accent); background:var(--panel); }
-  .field textarea{ resize:vertical; min-height:54px; }
+  .field textarea{ resize:vertical; min-height:60px; }
   .risk-choice{ display:flex; gap:8px; }
   .risk-choice button{
-    flex:1; padding:9px 0; border-radius:7px; border:1.5px solid var(--border);
-    background:var(--panel-2); color:var(--text-muted); font-size:12.5px; font-weight:600;
+    flex:1; padding:12px 0; border-radius:8px; border:2px solid var(--border);
+    background:var(--panel-2); color:var(--text-muted); font-size:15px; font-weight:700;
   }
   .risk-choice button[data-risk="high"].on{ background:var(--high-bg); border-color:var(--high); color:var(--high); }
   .risk-choice button[data-risk="mid"].on{ background:var(--mid-bg); border-color:var(--mid); color:var(--mid); }
@@ -225,31 +239,31 @@
   .field-row .field{ flex:1; }
   .modal-actions{ display:flex; gap:8px; margin-top:18px; }
   .modal-actions .btn{ flex:1; justify-content:center; }
-  .modal-close-x{ position:absolute; top:16px; right:16px; width:28px; height:28px; padding:0; justify-content:center; }
+  .modal-close-x{ position:absolute; top:16px; right:16px; width:34px; height:34px; padding:0; justify-content:center; font-size:16px; }
   .loc-row{ display:flex; gap:8px; }
   .loc-row select{ flex:1; }
-  .hint-text{ font-size:12px; color:var(--text-dim); margin-top:6px; line-height:1.5; }
+  .hint-text{ font-size:14px; color:var(--text-dim); margin-top:7px; line-height:1.6; }
 
   /* zone manage list */
-  .zone-list{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; max-height:240px; overflow-y:auto; }
+  .zone-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:240px; overflow-y:auto; }
   .zone-row{
     display:flex; align-items:center; justify-content:space-between; gap:8px;
-    background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:8px 10px;
+    background:var(--panel-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;
   }
-  .zone-row .name{ font-size:13px; font-weight:500; color:var(--text); }
+  .zone-row .name{ font-size:15px; font-weight:600; color:var(--text); }
   .zone-row .zone-actions{ display:flex; gap:4px; }
-  .zone-row button{ background:none; border:none; color:var(--text-muted); font-size:13px; padding:4px 6px; border-radius:5px; }
+  .zone-row button{ background:none; border:none; color:var(--text-muted); font-size:18px; padding:6px 8px; border-radius:6px; }
   .zone-row button:hover{ background:var(--border); color:var(--text); }
-  .zone-empty{ font-size:12px; color:var(--text-dim); padding:16px 0; text-align:center; }
+  .zone-empty{ font-size:14px; color:var(--text-dim); padding:16px 0; text-align:center; line-height:1.6; }
 
   /* zone-detail list modal */
   .zwork-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
 
   /* shared-data notice */
   .share-note{
-    font-size:11.5px; color:var(--text-dim); display:flex; align-items:center; gap:5px;
-    padding:6px 10px; background:var(--panel-2); border-radius:7px; margin-left:2px;
-    flex:1 1 auto; white-space:normal; line-height:1.4;
+    font-size:13.5px; color:var(--text-dim); display:flex; align-items:center; gap:6px;
+    padding:7px 12px; background:var(--panel-2); border-radius:8px; margin-left:2px;
+    flex:1 1 auto; white-space:normal; line-height:1.5; font-weight:500;
   }
   @media (max-width:700px){
     .share-note{ flex-basis:100%; margin-left:0; }
@@ -258,29 +272,80 @@
   #file-input{ display:none; }
 
   /* ---------- Bottom tab bar ---------- */
+  /* ---------- Full-page work registration (replaces modal) ---------- */
+  .page-view{
+    flex:1; overflow-y:auto; background:var(--panel); min-height:0;
+  }
+  .page-inner{ max-width:520px; margin:0 auto; padding:22px 20px 40px; }
+  .page-header{ display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+  .page-back{
+    background:none; border:none; color:var(--accent); font-size:16px; font-weight:700;
+    padding:8px 6px; margin-left:-6px; white-space:nowrap;
+  }
+  .page-header h2{ font-size:21px; font-weight:800; color:var(--text); }
+
+  #status-search{
+    width:100%; background:var(--panel-2); border:1.5px solid var(--border); border-radius:9px;
+    padding:12px 14px; color:var(--text); font-size:16px; margin-bottom:14px;
+  }
+  #status-search:focus{ outline:none; border-color:var(--accent); background:var(--panel); }
+  .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .chip{
+    padding:10px 18px; border-radius:22px; border:2px solid var(--border);
+    background:var(--panel-2); color:var(--text-muted); font-size:14px; font-weight:700;
+  }
+  .chip.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .status-group{ margin-bottom:22px; }
+  .status-group-head{
+    display:flex; align-items:center; gap:8px; font-size:16px; font-weight:800; color:var(--text);
+    margin-bottom:10px; padding-bottom:8px; border-bottom:2px solid var(--border);
+  }
+  .status-group-head .cnt{ color:var(--text-muted); font-weight:600; font-size:14px; }
+  .status-group .work-card{ margin-bottom:10px; }
+  .status-empty{ text-align:center; color:var(--text-dim); font-size:15px; padding:50px 20px; line-height:1.8; }
+
+  .bulk-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--accent-bg); border:1.5px solid var(--accent); border-radius:10px;
+    padding:12px 14px; margin-bottom:16px; font-size:14.5px; font-weight:700; color:var(--accent);
+  }
+  .work-card.bulk-mode{ cursor:pointer; }
+  .work-card.bulk-selected{ outline:3px solid var(--accent); outline-offset:-1px; background:var(--accent-bg); }
+
+  .staff-check-list{ display:flex; flex-wrap:wrap; gap:8px; }
+  .staff-chip{
+    display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:20px;
+    border:2px solid var(--border); background:var(--panel-2); font-size:14px; font-weight:600;
+    color:var(--text-muted); cursor:pointer; user-select:none;
+  }
+  .staff-chip input{ display:none; }
+  .staff-chip .role-tag{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
+  .staff-chip.checked{ background:var(--accent-bg); border-color:var(--accent); color:var(--accent); }
+  .staff-chip.checked .role-tag{ color:var(--accent); opacity:0.8; }
+
   .bottom-tabbar{
     display:flex; border-top:1px solid var(--border); background:var(--panel);
     flex-shrink:0; box-shadow:0 -2px 8px rgba(16,24,40,0.04);
   }
   .tab-btn{
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:2px; padding:8px 0 10px; background:none; border:none; color:var(--text-muted);
-    font-size:11px; font-weight:500;
+    gap:4px; padding:12px 0 13px; background:none; border:none; color:var(--text-muted);
+    font-size:13px; font-weight:600;
   }
-  .tab-btn .tab-icon{ font-size:19px; line-height:1; }
+  .tab-btn .tab-icon{ font-size:26px; line-height:1; }
   .tab-btn:hover{ background:var(--panel-2); }
   .tab-btn.active{ color:var(--accent); }
 
   /* ---------- Management panel ---------- */
   .mgmt-actions{ display:flex; flex-direction:column; gap:9px; }
-  .mgmt-actions .btn{ justify-content:flex-start; padding:12px 14px; font-size:13.5px; }
+  .mgmt-actions .btn{ justify-content:flex-start; padding:14px 16px; font-size:15.5px; }
 
   /* ---------- Pin risk badge (company-colored pins) ---------- */
   .pin-warn{
-    position:absolute; top:-6px; right:-8px; background:var(--high); color:#fff;
-    font-size:10px; font-weight:800; min-width:18px; height:18px; border-radius:9px;
-    display:flex; align-items:center; justify-content:center; padding:0 4px;
-    border:2px solid #fff; box-shadow:0 1px 3px rgba(16,24,40,0.3);
+    position:absolute; top:-8px; right:-10px; background:var(--high); color:#fff;
+    font-size:12.5px; font-weight:800; min-width:24px; height:24px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center; padding:0 5px;
+    border:2.5px solid #fff; box-shadow:0 1px 3px rgba(16,24,40,0.3);
   }
 
   @media (max-width:960px){
@@ -292,8 +357,8 @@
 
   .upload-status{
     position:absolute; top:14px; left:50%; transform:translateX(-50%);
-    background:var(--panel); border:1px solid var(--accent); color:var(--accent);
-    font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:8px;
+    background:var(--panel); border:1.5px solid var(--accent); color:var(--accent);
+    font-size:14.5px; font-weight:700; padding:10px 16px; border-radius:9px;
     z-index:50; box-shadow:var(--shadow-md); display:none; max-width:80%; text-align:center;
   }
   .upload-status.show{ display:block; }
@@ -351,6 +416,10 @@
       </div>
 
       <div class="place-hint" id="place-hint">지도를 클릭해서 위치를 지정하세요</div>
+      <div class="place-hint" id="area-draw-hint" style="display:none; align-items:center; gap:10px;">
+        <span>지도를 드래그해서 작업범위를 표시하세요</span>
+        <button id="area-draw-cancel" type="button" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
+      </div>
       <div class="upload-status" id="upload-status"></div>
       <div class="map-toolbar" id="map-toolbar" style="display:none;"></div>
       <div class="legend" id="legend" style="display:none;"></div>
@@ -365,6 +434,117 @@
     </div>
   </div>
 
+  <!-- Work add/edit page (full page, not a popup) -->
+  <div class="page-view" id="page-add-work" style="display:none;">
+    <div class="page-inner">
+      <div class="page-header">
+        <button class="page-back" id="page-back-btn">← 뒤로</button>
+        <h2 id="modal-title">위험작업 등록</h2>
+      </div>
+
+      <div class="field">
+        <label>위치</label>
+        <div class="loc-row">
+          <select id="f-zone"></select>
+          <button class="btn" id="new-zone-from-work" type="button">＋ 새 위치</button>
+        </div>
+        <div class="hint-text" id="zone-hint" style="display:none;">등록된 위치가 없습니다. "새 위치"로 먼저 만들어주세요.</div>
+      </div>
+
+      <div class="field">
+        <label>작업 내용</label>
+        <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치">
+      </div>
+
+      <div class="field">
+        <label>위험도</label>
+        <div class="risk-choice">
+          <button data-risk="high" type="button">고위험</button>
+          <button data-risk="mid" type="button">중위험</button>
+          <button data-risk="low" type="button">저위험</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>작업 범위 표시 (선택)</label>
+        <button type="button" class="btn" id="draw-area-btn">🗺️ 지도에서 범위 그리기</button>
+        <div class="hint-text" id="area-status-text" style="display:none;"></div>
+      </div>
+
+      <div class="field">
+        <label>작업 상태</label>
+        <button type="button" class="btn" id="status-toggle-btn">🔵 진행중</button>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>투입 인원</label><input type="number" id="f-people" min="1" placeholder="0"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>시작 시간</label><input type="time" id="f-time-start"></div>
+        <div class="field"><label>종료 시간</label><input type="time" id="f-time-end"></div>
+      </div>
+
+      <div class="field"><label>업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀"></div>
+      <div class="field">
+        <label>감시단 / 안전담당자</label>
+        <div class="staff-check-list" id="f-supervisor-checks"></div>
+        <div class="hint-text" id="staff-hint" style="display:none;">등록된 담당자가 없습니다. 관리 탭 → 담당자 관리에서 먼저 등록해주세요.</div>
+      </div>
+      <div class="field"><label>메모 (안전조치 등)</label><textarea id="f-note" placeholder="예: 안전대 체결 확인, 신호수 배치"></textarea></div>
+
+      <div class="modal-actions">
+        <button class="btn danger" id="delete-btn" style="display:none;">삭제</button>
+        <button class="btn primary" id="save-btn">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work status / browse page -->
+  <div class="page-view" id="page-status" style="display:none;">
+    <div class="page-inner">
+      <div class="page-header">
+        <button class="page-back" id="status-back-btn">← 뒤로</button>
+        <h2>작업현황</h2>
+      </div>
+
+      <div class="field">
+        <input type="text" id="status-search" placeholder="작업명 · 업체명 · 위치 · 담당자 검색">
+      </div>
+      <div class="chip-row" id="status-risk-chips">
+        <button class="chip active" data-risk="all" type="button">전체</button>
+        <button class="chip" data-risk="high" type="button">고위험</button>
+        <button class="chip" data-risk="mid" type="button">중위험</button>
+        <button class="chip" data-risk="low" type="button">저위험</button>
+      </div>
+
+      <button class="btn admin-only" id="bulk-select-toggle" style="display:none; margin-bottom:14px;">☑️&nbsp; 일괄 작업 완료</button>
+
+      <div class="bulk-bar" id="bulk-bar" style="display:none;">
+        <span id="bulk-count">0건 선택됨</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" id="bulk-cancel-btn">취소</button>
+          <button class="btn primary" id="bulk-complete-btn">완료 처리</button>
+        </div>
+      </div>
+
+      <div id="status-list"></div>
+    </div>
+  </div>
+
+  <!-- Staff (담당자) management page -->
+  <div class="page-view" id="page-staff" style="display:none;">
+    <div class="page-inner">
+      <div class="page-header">
+        <button class="page-back" id="staff-page-back-btn">← 뒤로</button>
+        <h2>담당자 관리</h2>
+      </div>
+
+      <div id="staff-page-list"></div>
+
+      <button class="btn primary" id="staff-page-add" style="width:100%; justify-content:center; margin-top:8px;">＋ 새 담당자 추가</button>
+    </div>
+  </div>
+
   <div class="bottom-tabbar">
     <button class="tab-btn active" id="tab-dashboard">
       <span class="tab-icon">🗺️</span><span>대시보드</span>
@@ -372,53 +552,12 @@
     <button class="tab-btn" id="tab-add-work">
       <span class="tab-icon">✏️</span><span>작업등록</span>
     </button>
+    <button class="tab-btn" id="tab-status">
+      <span class="tab-icon">📋</span><span>작업현황</span>
+    </button>
     <button class="tab-btn" id="tab-manage">
       <span class="tab-icon">🔧</span><span>관리</span>
     </button>
-  </div>
-</div>
-
-<!-- Work add/edit modal -->
-<div class="modal-backdrop" id="modal-backdrop">
-  <div class="modal">
-    <button class="btn modal-close-x" id="modal-close">✕</button>
-    <h3 id="modal-title">위험작업 등록</h3>
-
-    <div class="field">
-      <label>위치</label>
-      <div class="loc-row">
-        <select id="f-zone"></select>
-        <button class="btn" id="new-zone-from-work" type="button">＋ 새 위치</button>
-      </div>
-      <div class="hint-text" id="zone-hint" style="display:none;">등록된 위치가 없습니다. "새 위치"로 먼저 만들어주세요.</div>
-    </div>
-
-    <div class="field">
-      <label>작업 내용</label>
-      <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치">
-    </div>
-
-    <div class="field">
-      <label>위험도</label>
-      <div class="risk-choice">
-        <button data-risk="high" type="button">고위험</button>
-        <button data-risk="mid" type="button">중위험</button>
-        <button data-risk="low" type="button">저위험</button>
-      </div>
-    </div>
-
-    <div class="field-row">
-      <div class="field"><label>투입 인원</label><input type="number" id="f-people" min="1" placeholder="0"></div>
-      <div class="field"><label>작업 시간</label><input type="time" id="f-time"></div>
-    </div>
-
-    <div class="field"><label>업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀"></div>
-    <div class="field"><label>메모 (안전조치 등)</label><textarea id="f-note" placeholder="예: 안전대 체결 확인, 신호수 배치"></textarea></div>
-
-    <div class="modal-actions">
-      <button class="btn danger" id="delete-btn" style="display:none;">삭제</button>
-      <button class="btn primary" id="save-btn">저장</button>
-    </div>
   </div>
 </div>
 
@@ -470,6 +609,29 @@
   </div>
 </div>
 
+<!-- Staff (담당자) naming modal -->
+<div class="modal-backdrop" id="staff-name-backdrop">
+  <div class="modal" style="max-width:320px;">
+    <button class="btn modal-close-x" id="staff-name-close">✕</button>
+    <h3>담당자 등록</h3>
+    <div class="field"><label>이름</label><input type="text" id="sn-name" placeholder="예: 김경호"></div>
+    <div class="field">
+      <label>역할</label>
+      <select id="sn-role">
+        <option value="관리감독자">관리감독자</option>
+        <option value="안전관리자">안전관리자</option>
+        <option value="안전감시단">안전감시단</option>
+        <option value="안전보건총괄책임자">안전보건총괄책임자</option>
+      </select>
+    </div>
+    <div class="hint-text" id="sn-error" style="display:none; color:var(--high);">저장 실패. 관리자 콘솔에서 Firestore 규칙을 확인해주세요.</div>
+    <div class="modal-actions">
+      <button class="btn primary" id="sn-save" style="width:100%;">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Staff management modal -->
 <!-- Admin management panel -->
 <div class="modal-backdrop" id="manage-panel-backdrop">
   <div class="modal" style="max-width:320px;">
@@ -478,6 +640,7 @@
     <div class="mgmt-actions">
       <button class="btn" id="mp-upload-map">🛰️&nbsp; 지도 업로드 / 교체</button>
       <button class="btn" id="mp-manage-zones">📍&nbsp; 위치(구역) 관리</button>
+      <button class="btn" id="mp-manage-staff">👷&nbsp; 담당자 관리</button>
       <button class="btn danger" id="mp-admin-off">🔓&nbsp; 관리자 모드 끄기</button>
     </div>
   </div>
@@ -518,9 +681,11 @@ const db = getFirestore(fbApp);
 
   let currentDate = todayStr();
   let zones = [];            // [{id,name,xPct,yPct}]
-  let markers = [];          // works for currentDate [{id,zoneId,workType,risk,people,time,company,note}]
+  let staffList = [];        // [{id,name,role}]
+  let markers = [];          // works for currentDate [{id,zoneId,workType,risk,people,time,company,note,supervisor}]
   let editingId = null;
   let selectedRisk = 'high';
+  let workStatus = 'in_progress';
   let mapImageURL = null;
 
   let placing = false;
@@ -587,10 +752,12 @@ const db = getFirestore(fbApp);
   function setActiveTab(tab){
     $('tab-dashboard').classList.toggle('active', tab==='dashboard');
     $('tab-add-work').classList.toggle('active', tab==='add-work');
+    $('tab-status').classList.toggle('active', tab==='status');
     $('tab-manage').classList.toggle('active', tab==='manage');
   }
   $('tab-dashboard').addEventListener('click', ()=>{
-    setActiveTab('dashboard');
+    closeWorkModal();
+    closeStatusPage();
     mapWrap.scrollIntoView({ behavior:'smooth', block:'start' });
   });
   $('tab-add-work').addEventListener('click', ()=>{
@@ -598,8 +765,10 @@ const db = getFirestore(fbApp);
       if(isAdmin) fileInput.click();
       return;
     }
-    setActiveTab('add-work');
     openWorkModal(null, zones[0] ? zones[0].id : null);
+  });
+  $('tab-status').addEventListener('click', ()=>{
+    openStatusPage();
   });
   $('tab-manage').addEventListener('click', ()=>{
     setActiveTab('manage');
@@ -614,6 +783,7 @@ const db = getFirestore(fbApp);
   managePanelBackdrop.addEventListener('click', (e)=>{ if(e.target===managePanelBackdrop) closeManagePanel(); });
   $('mp-upload-map').addEventListener('click', ()=>{ closeManagePanel(); fileInput.click(); });
   $('mp-manage-zones').addEventListener('click', ()=>{ managePanelBackdrop.classList.remove('show'); openZoneManageModal(); });
+  $('mp-manage-staff').addEventListener('click', ()=>{ managePanelBackdrop.classList.remove('show'); openStaffPage(); });
   $('mp-admin-off').addEventListener('click', ()=>{ isAdmin = false; setAdminUI(); closeManagePanel(); });
 
   function todayStr(){
@@ -654,6 +824,12 @@ const db = getFirestore(fbApp);
       renderAllPins();
       renderSidebar();
     }, (err)=>{ console.error('zones listen error', err); });
+
+    // staff (담당자) collection, realtime
+    onSnapshot(collection(db, 'staff'), (snap)=>{
+      staffList = snap.docs.map(d=>({ id: d.id, ...d.data() }));
+      renderStaffPageList();
+    }, (err)=>{ console.error('staff listen error', err); });
 
     subscribeWorks(currentDate);
   }
@@ -797,18 +973,111 @@ const db = getFirestore(fbApp);
       imgEl = document.createElement('img');
       mapCanvas.insertBefore(imgEl, mapCanvas.firstChild);
       imgEl.addEventListener('click', onMapClick);
+      imgEl.addEventListener('pointerdown', onAreaPointerDown);
     }
     imgEl.src = mapImageURL;
   }
 
-  // ---------------- zone placement (click map) ----------------
+  // ---------------- work-area drawing (drag a rectangle on the map) ----------------
+  let drawingArea = false;
+  let areaDrawFromWorkModal = false;
+  let areaDrawImgRect = null;
+  let areaDrawStartPct = null;
+  let liveAreaRectEl = null;
+  let pendingArea = null; // {x1,y1,x2,y2} in percent, 0-100
+
+  function startAreaDrawing(){
+    if(!mapImageURL) return;
+    drawingArea = true;
+    areaDrawFromWorkModal = true;
+    $('area-draw-hint').style.display = 'flex';
+    mapWrap.classList.add('area-drawing');
+    hideWorkPage();
+  }
+  function cancelAreaDrawing(){
+    drawingArea = false;
+    areaDrawStartPct = null;
+    $('area-draw-hint').style.display = 'none';
+    mapWrap.classList.remove('area-drawing');
+    if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
+    if(areaDrawFromWorkModal) showWorkPage();
+  }
+  $('area-draw-cancel').addEventListener('click', cancelAreaDrawing);
+
+  function pctFromEvent(e){
+    const x = ((e.clientX - areaDrawImgRect.left) / areaDrawImgRect.width) * 100;
+    const y = ((e.clientY - areaDrawImgRect.top) / areaDrawImgRect.height) * 100;
+    return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+  }
+
+  function onAreaPointerDown(e){
+    if(!drawingArea) return;
+    e.preventDefault();
+    areaDrawImgRect = e.currentTarget.getBoundingClientRect();
+    areaDrawStartPct = pctFromEvent(e);
+    liveAreaRectEl = document.createElement('div');
+    liveAreaRectEl.className = 'area-draw-rect';
+    mapCanvas.appendChild(liveAreaRectEl);
+    window.addEventListener('pointermove', onAreaPointerMove);
+    window.addEventListener('pointerup', onAreaPointerUp, { once:true });
+  }
+  function onAreaPointerMove(e){
+    if(!drawingArea || !areaDrawStartPct || !liveAreaRectEl) return;
+    const cur = pctFromEvent(e);
+    const x1 = Math.min(areaDrawStartPct.x, cur.x), x2 = Math.max(areaDrawStartPct.x, cur.x);
+    const y1 = Math.min(areaDrawStartPct.y, cur.y), y2 = Math.max(areaDrawStartPct.y, cur.y);
+    liveAreaRectEl.style.left = x1 + '%';
+    liveAreaRectEl.style.top = y1 + '%';
+    liveAreaRectEl.style.width = (x2-x1) + '%';
+    liveAreaRectEl.style.height = (y2-y1) + '%';
+  }
+  function onAreaPointerUp(e){
+    window.removeEventListener('pointermove', onAreaPointerMove);
+    if(!drawingArea || !areaDrawStartPct){ return; }
+    const cur = pctFromEvent(e);
+    const x1 = Math.min(areaDrawStartPct.x, cur.x), x2 = Math.max(areaDrawStartPct.x, cur.x);
+    const y1 = Math.min(areaDrawStartPct.y, cur.y), y2 = Math.max(areaDrawStartPct.y, cur.y);
+    areaDrawStartPct = null;
+
+    if((x2-x1) < 2 || (y2-y1) < 2){
+      // too small, likely an accidental tap — remove and let them try again
+      if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
+      return;
+    }
+
+    pendingArea = { x1, y1, x2, y2 };
+    drawingArea = false;
+    $('area-draw-hint').style.display = 'none';
+    mapWrap.classList.remove('area-drawing');
+    if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
+    updateAreaStatusText();
+    if(areaDrawFromWorkModal) showWorkPage();
+  }
+
+  function updateAreaStatusText(){
+    const el = $('area-status-text');
+    const btn = $('draw-area-btn');
+    if(pendingArea){
+      el.style.display = 'block';
+      el.innerHTML = '✅ 작업범위가 지정되었습니다. <a href="#" id="area-clear-link" style="color:var(--high); font-weight:600;">범위 삭제</a>';
+      btn.textContent = '🗺️ 범위 다시 그리기';
+      const clearLink = $('area-clear-link');
+      if(clearLink) clearLink.addEventListener('click', (e)=>{ e.preventDefault(); pendingArea = null; updateAreaStatusText(); });
+    } else {
+      el.style.display = 'none';
+      btn.textContent = '🗺️ 지도에서 범위 그리기';
+    }
+  }
+  $('draw-area-btn').addEventListener('click', startAreaDrawing);
+
+
   function startPlacing(fromWorkModal){
     if(!mapImageURL){ fileInput.click(); return; }
     placing = true;
     placingFromWorkModal = fromWorkModal;
     placeHint.classList.add('show');
     mapWrap.classList.add('place-cursor');
-    backdrop.classList.remove('show');
+    hideWorkPage();
     zoneManageBackdrop.classList.remove('show');
   }
   function cancelPlacing(){
@@ -925,6 +1194,125 @@ const db = getFirestore(fbApp);
     });
   }
 
+  // ---------------- staff (담당자) management ----------------
+  const staffPage = $('page-staff');
+  const staffNameBackdrop = $('staff-name-backdrop');
+  let staffEditId = null;
+  const STAFF_ROLE_ORDER = ['관리감독자','안전관리자','안전감시단','안전보건총괄책임자'];
+
+  function openStaffPage(){
+    closeAllPages();
+    mainArea.style.display = 'none';
+    staffPage.style.display = 'block';
+    setActiveTab('manage');
+    renderStaffPageList();
+  }
+  $('staff-page-back-btn').addEventListener('click', ()=>{ closeAllPages(); setActiveTab('dashboard'); });
+
+  $('staff-page-add').addEventListener('click', ()=>{
+    staffEditId = null;
+    $('sn-name').value = '';
+    $('sn-role').value = '관리감독자';
+    $('sn-error').style.display='none'; staffNameBackdrop.classList.add('show');
+    setTimeout(()=>$('sn-name').focus(), 50);
+  });
+  $('staff-name-close').addEventListener('click', ()=>{ staffNameBackdrop.classList.remove('show'); staffEditId = null; });
+  staffNameBackdrop.addEventListener('click', (e)=>{ if(e.target===staffNameBackdrop){ staffNameBackdrop.classList.remove('show'); staffEditId = null; } });
+
+  $('sn-save').addEventListener('click', async ()=>{
+    const name = $('sn-name').value.trim();
+    const role = $('sn-role').value;
+    if(!name) return;
+    $('sn-error').style.display = 'none';
+    try{
+      if(staffEditId){
+        await updateDoc(doc(db,'staff',staffEditId), { name, role });
+      } else {
+        await addDoc(collection(db,'staff'), { name, role, createdAt: Date.now() });
+      }
+      staffNameBackdrop.classList.remove('show');
+      staffEditId = null;
+    }catch(e){
+      console.error('staff save failed', e);
+      $('sn-error').textContent = '저장 실패: ' + (e && e.message ? e.message : '알 수 없는 오류');
+      $('sn-error').style.display = 'block';
+    }
+  });
+
+  function renderStaffPageList(){
+    const list = $('staff-page-list');
+    if(!list) return;
+    list.innerHTML = '';
+    if(staffList.length === 0){
+      list.innerHTML = '<div class="status-empty">등록된 담당자가 없습니다.<br>아래 "＋ 새 담당자 추가"로 등록해보세요.</div>';
+      return;
+    }
+
+    const groups = new Map();
+    STAFF_ROLE_ORDER.forEach(r=>groups.set(r, []));
+    staffList.forEach(s=>{
+      const key = STAFF_ROLE_ORDER.includes(s.role) ? s.role : '기타';
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(s);
+    });
+
+    groups.forEach((people, role)=>{
+      if(people.length === 0) return;
+      const groupEl = document.createElement('div');
+      groupEl.className = 'status-group';
+      groupEl.innerHTML = `<div class="status-group-head">${escapeHTML(role)}<span class="cnt">${people.length}명</span></div>`;
+      const rowsWrap = document.createElement('div');
+      rowsWrap.className = 'zone-list';
+      people.forEach(s=>{
+        const row = document.createElement('div');
+        row.className = 'zone-row';
+        row.innerHTML = `<span class="name">👷 ${escapeHTML(s.name)}</span>
+          <span class="zone-actions">
+            <button data-act="edit" title="수정">✏️</button>
+            <button data-act="delete" title="삭제">🗑️</button>
+          </span>`;
+        row.querySelector('[data-act="edit"]').addEventListener('click', ()=>{
+          staffEditId = s.id;
+          $('sn-name').value = s.name;
+          $('sn-role').value = s.role || '관리감독자';
+          $('sn-error').style.display='none'; staffNameBackdrop.classList.add('show');
+          setTimeout(()=>$('sn-name').focus(), 50);
+        });
+        row.querySelector('[data-act="delete"]').addEventListener('click', async ()=>{
+          try{
+            await deleteDoc(doc(db,'staff',s.id));
+            staffList = staffList.filter(x=>x.id!==s.id);
+            renderStaffPageList();
+          }catch(e){ console.error('staff delete failed', e); }
+        });
+        rowsWrap.appendChild(row);
+      });
+      groupEl.appendChild(rowsWrap);
+      list.appendChild(groupEl);
+    });
+  }
+
+  function renderStaffChecklist(selectedNames){
+    const wrap = $('f-supervisor-checks');
+    wrap.innerHTML = '';
+    if(staffList.length === 0){
+      $('staff-hint').style.display = 'block';
+      return;
+    }
+    $('staff-hint').style.display = 'none';
+    staffList.forEach(s=>{
+      const label = document.createElement('label');
+      label.className = 'staff-chip';
+      const checked = selectedNames.includes(s.name);
+      if(checked) label.classList.add('checked');
+      label.innerHTML = `<input type="checkbox" value="${escapeHTML(s.name)}" ${checked?'checked':''}> ${escapeHTML(s.name)} <span class="role-tag">${escapeHTML(s.role||'')}</span>`;
+      label.querySelector('input').addEventListener('change', (e)=>{
+        label.classList.toggle('checked', e.target.checked);
+      });
+      wrap.appendChild(label);
+    });
+  }
+
   // ---------------- pins on map ----------------
   function riskRank(r){ return r==='high'?0:r==='mid'?1:2; }
   function riskLabel(r){ return r==='high'?'고위험':r==='mid'?'중위험':'저위험'; }
@@ -939,8 +1327,23 @@ const db = getFirestore(fbApp);
   }
 
   function renderAllPins(){
-    mapCanvas.querySelectorAll('.pin, .zone-dot').forEach(p=>p.remove());
+    mapCanvas.querySelectorAll('.pin, .zone-dot, .area-overlay').forEach(p=>p.remove());
     if(!mapImageURL){ renderLegend(); return; }
+
+    const riskColorVar = { high:'var(--high)', mid:'var(--mid)', low:'var(--low)' };
+    markers.forEach(m=>{
+      if(!m.area) return;
+      const rect = document.createElement('div');
+      rect.className = 'area-overlay';
+      const color = riskColorVar[m.risk] || 'var(--text-dim)';
+      rect.style.left = m.area.x1 + '%';
+      rect.style.top = m.area.y1 + '%';
+      rect.style.width = (m.area.x2 - m.area.x1) + '%';
+      rect.style.height = (m.area.y2 - m.area.y1) + '%';
+      rect.style.borderColor = color;
+      rect.style.background = 'color-mix(in srgb, ' + color + ' 16%, transparent)';
+      mapCanvas.appendChild(rect);
+    });
 
     zones.forEach(zone=>{
       const worksHere = markers.filter(m=>m.zoneId === zone.id);
@@ -1006,9 +1409,9 @@ const db = getFirestore(fbApp);
         card.className = 'work-card';
         card.dataset.risk = m.risk;
         card.innerHTML = `
-          <div class="work-card-top"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="time">${m.time||''}</span></div>
+          <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span></span><span class="time">${m.time||''}</span></div>
           <h4>${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
-          <div class="meta"><span>👷 ${m.people}명</span>${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}</div>`;
+          <div class="meta"><span>👷 ${m.people}명</span>${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}</div>`;
         card.addEventListener('click', ()=>{ zoneDetailBackdrop.classList.remove('show'); openWorkModal(m.id); });
         list.appendChild(card);
       });
@@ -1038,12 +1441,13 @@ const db = getFirestore(fbApp);
       card.className = 'work-card';
       card.dataset.risk = m.risk;
       card.innerHTML = `
-        <div class="work-card-top"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="time">${m.time||''}</span></div>
+        <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span></span><span class="time">${m.time||''}</span></div>
         <h4>${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
         <div class="meta">
           ${zone ? `<span class="loc">📍 ${escapeHTML(zone.name)}</span>` : ''}
           <span>👷 ${m.people}명</span>
           ${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}
+          ${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}
         </div>`;
       card.addEventListener('click', ()=>openWorkModal(m.id));
       list.appendChild(card);
@@ -1061,8 +1465,19 @@ const db = getFirestore(fbApp);
     $('stat-low').textContent = markers.filter(m=>m.risk==='low').length;
   }
 
-  // ---------------- work add/edit modal ----------------
-  const backdrop = $('modal-backdrop');
+  // ---------------- page switching (dashboard / work add-edit / status) ----------------
+  const workPage = $('page-add-work');
+  const statusPage = $('page-status');
+  const mainArea = document.querySelector('.main');
+
+  function closeAllPages(){
+    workPage.style.display = 'none';
+    statusPage.style.display = 'none';
+    staffPage.style.display = 'none';
+    mainArea.style.display = 'flex';
+  }
+  function showWorkPage(){ closeAllPages(); mainArea.style.display = 'none'; workPage.style.display = 'block'; }
+  function hideWorkPage(){ closeAllPages(); }
 
   function populateZoneSelect(selectedId){
     const sel = $('f-zone');
@@ -1090,19 +1505,154 @@ const db = getFirestore(fbApp);
     populateZoneSelect(m ? m.zoneId : presetZoneId);
     $('f-worktype').value = m ? m.workType : '';
     $('f-people').value = m ? m.people : '';
-    $('f-time').value = m ? m.time : '';
+    if(m && m.time && m.time.includes('~')){
+      const [ts, te] = m.time.split('~').map(s=>s.trim());
+      $('f-time-start').value = ts || '';
+      $('f-time-end').value = te || '';
+    } else {
+      $('f-time-start').value = m ? (m.time || '') : '';
+      $('f-time-end').value = '';
+    }
     $('f-company').value = m ? m.company : '';
+    const selectedSupervisors = m && m.supervisor ? m.supervisor.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    renderStaffChecklist(selectedSupervisors);
     $('f-note').value = m ? m.note : '';
     selectedRisk = m ? m.risk : 'high';
     updateRiskButtons();
+    workStatus = m ? (m.status || 'in_progress') : 'in_progress';
+    updateStatusToggleBtn();
+    pendingArea = (m && m.area) ? m.area : null;
+    updateAreaStatusText();
     $('delete-btn').style.display = m ? 'block' : 'none';
-    backdrop.classList.add('show');
+    showWorkPage();
+    setActiveTab('add-work');
   }
-  function closeWorkModal(){ backdrop.classList.remove('show'); editingId = null; setActiveTab('dashboard'); }
+  function closeWorkModal(){ hideWorkPage(); editingId = null; pendingArea = null; setActiveTab('dashboard'); }
 
-  $('modal-close').addEventListener('click', closeWorkModal);
-  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) closeWorkModal(); });
+  $('page-back-btn').addEventListener('click', closeWorkModal);
   $('new-zone-from-work').addEventListener('click', ()=> requireAdmin(()=> startPlacing(true)));
+
+  // ---------------- status page (browse today's works, grouped by company) ----------------
+  let statusSearch = '';
+  let statusRiskFilter = 'all';
+
+  function openStatusPage(){
+    closeAllPages();
+    mainArea.style.display = 'none';
+    statusPage.style.display = 'block';
+    setActiveTab('status');
+    renderStatusList();
+  }
+  function closeStatusPage(){
+    if(statusPage.style.display === 'block'){ closeAllPages(); }
+  }
+  $('status-back-btn').addEventListener('click', ()=>{ bulkSelectMode = false; bulkSelectedIds.clear(); closeAllPages(); setActiveTab('dashboard'); });
+  $('status-search').addEventListener('input', (e)=>{ statusSearch = e.target.value.trim().toLowerCase(); renderStatusList(); });
+  document.querySelectorAll('#status-risk-chips .chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      statusRiskFilter = chip.dataset.risk;
+      document.querySelectorAll('#status-risk-chips .chip').forEach(c=>c.classList.toggle('active', c===chip));
+      renderStatusList();
+    });
+  });
+
+  function renderStatusList(){
+    const list = $('status-list');
+    list.innerHTML = '';
+
+    const matches = (m)=>{
+      if(statusRiskFilter !== 'all' && m.risk !== statusRiskFilter) return false;
+      if(!statusSearch) return true;
+      const zone = zones.find(z=>z.id===m.zoneId);
+      const hay = [m.workType, m.company, m.supervisor, zone ? zone.name : ''].join(' ').toLowerCase();
+      return hay.includes(statusSearch);
+    };
+
+    const filtered = markers.filter(matches);
+    if(filtered.length === 0){
+      list.innerHTML = '<div class="status-empty">조건에 맞는 작업이 없습니다.</div>';
+      return;
+    }
+
+    // group by company (works without a company go under "업체 미지정")
+    const groups = new Map();
+    filtered.forEach(m=>{
+      const key = m.company || '업체 미지정';
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(m);
+    });
+
+    groups.forEach((works, companyName)=>{
+      works.sort((a,b)=> riskRank(a.risk)-riskRank(b.risk) || (a.time||'').localeCompare(b.time||''));
+      const groupEl = document.createElement('div');
+      groupEl.className = 'status-group';
+      const dotColor = companyName === '업체 미지정' ? '#9CA3AF' : companyColor(companyName);
+      groupEl.innerHTML = `<div class="status-group-head"><i class="dot" style="width:11px;height:11px;border-radius:50%;background:${dotColor};display:inline-block;"></i>${escapeHTML(companyName)}<span class="cnt">${works.length}건</span></div>`;
+      const cardsWrap = document.createElement('div');
+      works.forEach(m=>{
+        const zone = zones.find(z=>z.id===m.zoneId);
+        const card = document.createElement('div');
+        card.className = 'work-card';
+        card.dataset.risk = m.risk;
+        card.innerHTML = `
+          <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span></span><span class="time">${m.time||''}</span></div>
+          <h4>${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
+          <div class="meta">
+            ${zone ? `<span class="loc">📍 ${escapeHTML(zone.name)}</span>` : ''}
+            <span>👷 ${m.people}명</span>
+            ${m.supervisor ? `<span>🦺 ${escapeHTML(m.supervisor)}</span>` : ''}
+          </div>`;
+        if(bulkSelectMode){
+          card.classList.add('bulk-mode');
+          if(bulkSelectedIds.has(m.id)) card.classList.add('bulk-selected');
+          card.addEventListener('click', ()=>{
+            if(bulkSelectedIds.has(m.id)){ bulkSelectedIds.delete(m.id); card.classList.remove('bulk-selected'); }
+            else { bulkSelectedIds.add(m.id); card.classList.add('bulk-selected'); }
+            updateBulkBar();
+          });
+        } else {
+          card.addEventListener('click', ()=>openWorkModal(m.id));
+        }
+        cardsWrap.appendChild(card);
+      });
+      groupEl.appendChild(cardsWrap);
+      list.appendChild(groupEl);
+    });
+  }
+
+  // ---------------- bulk complete (admin only) ----------------
+  let bulkSelectMode = false;
+  let bulkSelectedIds = new Set();
+
+  $('bulk-select-toggle').addEventListener('click', ()=>{
+    bulkSelectMode = true;
+    bulkSelectedIds.clear();
+    updateBulkBar();
+    renderStatusList();
+  });
+  $('bulk-cancel-btn').addEventListener('click', ()=>{
+    bulkSelectMode = false;
+    bulkSelectedIds.clear();
+    updateBulkBar();
+    renderStatusList();
+  });
+  $('bulk-complete-btn').addEventListener('click', async ()=>{
+    if(bulkSelectedIds.size === 0) return;
+    const ids = [...bulkSelectedIds];
+    try{
+      await Promise.all(ids.map(id => updateDoc(doc(db,'works',id), { status:'done' })));
+    }catch(e){ console.error('bulk complete failed', e); }
+    bulkSelectMode = false;
+    bulkSelectedIds.clear();
+    updateBulkBar();
+    renderStatusList();
+  });
+  function updateBulkBar(){
+    const bar = $('bulk-bar');
+    bar.style.display = bulkSelectMode ? 'flex' : 'none';
+    $('bulk-count').textContent = bulkSelectedIds.size + '건 선택됨';
+    $('bulk-complete-btn').disabled = bulkSelectedIds.size === 0;
+  }
 
   document.querySelectorAll('.risk-choice button').forEach(btn=>{
     btn.addEventListener('click', ()=>{ selectedRisk = btn.dataset.risk; updateRiskButtons(); });
@@ -1111,23 +1661,43 @@ const db = getFirestore(fbApp);
     document.querySelectorAll('.risk-choice button').forEach(btn=> btn.classList.toggle('on', btn.dataset.risk===selectedRisk));
   }
 
+  $('status-toggle-btn').addEventListener('click', ()=>{
+    workStatus = workStatus === 'done' ? 'in_progress' : 'done';
+    updateStatusToggleBtn();
+  });
+  function updateStatusToggleBtn(){
+    const btn = $('status-toggle-btn');
+    if(workStatus === 'done'){
+      btn.textContent = '✅ 완료';
+      btn.classList.add('status-done');
+    } else {
+      btn.textContent = '🔵 진행중';
+      btn.classList.remove('status-done');
+    }
+  }
+
   $('save-btn').addEventListener('click', async ()=>{
     const zoneId = $('f-zone').value;
     const workType = $('f-worktype').value.trim();
     const people = Number($('f-people').value) || 0;
-    const time = $('f-time').value;
+    const timeStart = $('f-time-start').value;
+    const timeEnd = $('f-time-end').value;
+    const time = timeStart && timeEnd ? `${timeStart}~${timeEnd}` : (timeStart || timeEnd || '');
     const company = $('f-company').value.trim();
+    const supervisor = [...document.querySelectorAll('#f-supervisor-checks input:checked')].map(el=>el.value).join(', ');
     const note = $('f-note').value.trim();
+    const area = pendingArea || null;
+    const status = workStatus;
 
     if(!zoneId){ return; }
     if(!workType){ $('f-worktype').focus(); return; }
 
     try{
       if(editingId){
-        await updateDoc(doc(db,'works',editingId), { zoneId, workType, people, time, company, note, risk: selectedRisk });
+        await updateDoc(doc(db,'works',editingId), { zoneId, workType, people, time, company, supervisor, note, area, status, risk: selectedRisk });
       } else {
         await addDoc(collection(db,'works'), {
-          date: currentDate, zoneId, workType, people, time, company, note, risk: selectedRisk, createdAt: Date.now()
+          date: currentDate, zoneId, workType, people, time, company, supervisor, note, area, status, risk: selectedRisk, createdAt: Date.now()
         });
       }
       closeWorkModal();
@@ -1151,3 +1721,4 @@ const db = getFirestore(fbApp);
 
 </body>
 </html>
+
