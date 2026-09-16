@@ -46,9 +46,11 @@
   button{ font-family:inherit; cursor:pointer; }
   input, select, textarea{ font-family:inherit; }
 
-  .app{ padding-bottom:76px; }
+  .app{ position:relative; }
   .dashboard-viewport{
-    display:flex; flex-direction:column; height:100vh; height:100dvh; min-height:600px; padding-bottom:76px;
+    display:flex; flex-direction:column;
+    position:fixed; top:0; left:0; right:0; bottom:76px;
+    overflow-y:auto; background:var(--bg); z-index:5;
   }
 
   /* ---------- Header ---------- */
@@ -65,6 +67,20 @@
   }
   .site-name-input:hover, .site-name-input:focus{ border-bottom:1px solid var(--border); outline:none; color:var(--text); }
   .header-right{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .weather-widget{
+    display:flex; align-items:center; gap:7px; background:var(--panel-2);
+    border:1px solid var(--border); border-radius:9px; padding:7px 12px;
+    font-size:13.5px; color:var(--text-muted); font-weight:600; white-space:nowrap;
+  }
+  .weather-widget .w-icon{ font-size:18px; }
+  .weather-widget .w-temp{ color:var(--text); font-weight:800; font-size:15px; }
+  .weather-widget .w-meta{ font-size:11px; color:var(--text-dim); font-weight:500; }
+  .manage-corner-btn{
+    background:none; border:none; color:var(--text-dim); font-size:15px;
+    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+    border-radius:6px; opacity:0.55;
+  }
+  .manage-corner-btn:hover{ opacity:1; background:var(--panel-2); }
   .date-nav{
     display:flex; align-items:center; gap:4px; background:var(--panel-2);
     border:1px solid var(--border); border-radius:10px; padding:5px;
@@ -189,7 +205,7 @@
 
   /* ---------- Sidebar ---------- */
   .sidebar{
-    flex:0 0 32%; max-width:400px; min-width:280px; border-right:1px solid var(--border);
+    flex:0 0 27%; max-width:340px; min-width:280px; border-right:1px solid var(--border);
     background:var(--panel); display:flex; flex-direction:column; min-height:0;
     order:-1;
   }
@@ -293,7 +309,8 @@
   /* ---------- Bottom tab bar ---------- */
   /* ---------- Full-page work registration (replaces modal) ---------- */
   .page-view{
-    flex:1; overflow-y:auto; background:var(--panel); min-height:0;
+    position:fixed; top:0; left:0; right:0; bottom:76px;
+    overflow-y:auto; background:var(--panel); z-index:6;
   }
   .page-inner{ max-width:520px; margin:0 auto; padding:22px 20px 40px; }
   .page-header{ display:flex; align-items:center; gap:14px; margin-bottom:22px; }
@@ -406,11 +423,13 @@
       <span class="share-note">🔗 이 링크에 접속하는 모든 협력업체와 데이터가 공유돼요</span>
     </div>
     <div class="header-right">
+      <div class="weather-widget" id="weather-widget" style="display:none;"></div>
       <div class="date-nav">
         <button id="prev-day">‹</button>
         <input type="date" id="date-picker">
         <button id="next-day">›</button>
       </div>
+      <button id="tab-manage" class="manage-corner-btn" title="관리">⚙️</button>
       <input type="file" id="file-input" accept="image/*">
     </div>
   </div>
@@ -466,14 +485,6 @@
     <div class="stat-card mid"><div class="num" id="stat-mid">0</div><div class="label">중위험 건수</div></div>
     <div class="stat-card low"><div class="num" id="stat-low">0</div><div class="label">저위험 건수</div></div>
   </div>
-  </div>
-
-  <div class="full-list-section">
-    <div class="sidebar-head">
-      <h2>오늘의 작업 목록</h2>
-      <span class="count" id="full-list-count">0건</span>
-    </div>
-    <div id="full-work-list" class="full-work-list"></div>
   </div>
 
   <!-- Work add/edit page (full page, not a popup) -->
@@ -596,9 +607,6 @@
     </button>
     <button class="tab-btn" id="tab-status">
       <span class="tab-icon">📋</span><span>작업현황</span>
-    </button>
-    <button class="tab-btn" id="tab-manage">
-      <span class="tab-icon">🔧</span><span>관리</span>
     </button>
   </div>
 </div>
@@ -741,7 +749,7 @@ const db = getFirestore(fbApp);
   // NOTE: this is a lightweight UI gate, not real security — anyone who reads
   // this file's source can find the PIN. Change it to something private below.
   // For real access control, upgrade to Firebase Authentication.
-  const ADMIN_PIN = "1234";
+  const ADMIN_PIN = "0049";
   let isAdmin = false;
   let pendingAdminAction = null; // function to run after successful PIN entry
 
@@ -1821,6 +1829,43 @@ const db = getFirestore(fbApp);
       closeWorkModal();
     }catch(e){ console.error('work delete failed', e); }
   });
+
+  // ---------------- weather widget (Open-Meteo, free, no API key) ----------------
+  // Coordinates: 광주 북구 운암동 일대 (approximate, city-scale accuracy is enough for weather)
+  const WEATHER_LAT = 35.1799;
+  const WEATHER_LON = 126.8909;
+
+  function weatherIconAndLabel(code){
+    if(code === 0) return ['☀️', '맑음'];
+    if([1,2].includes(code)) return ['🌤️', '대체로 맑음'];
+    if(code === 3) return ['☁️', '흐림'];
+    if([45,48].includes(code)) return ['🌫️', '안개'];
+    if([51,53,55,56,57].includes(code)) return ['🌦️', '이슬비'];
+    if([61,63,65,66,67].includes(code)) return ['🌧️', '비'];
+    if([71,73,75,77,85,86].includes(code)) return ['🌨️', '눈'];
+    if([80,81,82].includes(code)) return ['🌦️', '소나기'];
+    if([95,96,99].includes(code)) return ['⛈️', '뇌우'];
+    return ['🌡️', '날씨'];
+  }
+
+  async function loadWeather(){
+    try{
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LON}&current=temperature_2m,weather_code&timezone=Asia%2FSeoul`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const temp = Math.round(data.current.temperature_2m);
+      const code = data.current.weather_code;
+      const [icon, label] = weatherIconAndLabel(code);
+      const timeStr = new Date(data.current.time).toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' });
+      const widget = $('weather-widget');
+      widget.innerHTML = `<span class="w-icon">${icon}</span><span class="w-temp">${temp}°</span><span>${label}</span><span class="w-meta">· ${timeStr} 기준 · Open-Meteo</span>`;
+      widget.style.display = 'flex';
+    }catch(e){
+      console.error('weather load failed', e);
+    }
+  }
+  loadWeather();
+  setInterval(loadWeather, 30 * 60 * 1000); // refresh every 30 min
 
   setAdminUI();
   init();
