@@ -98,7 +98,12 @@
   /* ---------- Main layout ---------- */
   .main{ flex:1; display:flex; min-height:0; }
   .map-wrap{
-    flex:1 1 68%; position:relative;
+    flex:1 1 68%; display:flex; flex-direction:column; min-height:0;
+    background:var(--panel);
+    overflow:hidden;
+  }
+  .map-viewport{
+    flex:1; min-height:0; position:relative;
     background:
       linear-gradient(var(--border) 1px, transparent 1px) 0 0/24px 24px,
       linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0/24px 24px,
@@ -120,16 +125,16 @@
     border:1.5px solid var(--accent); color:#1D4ED8; font-size:14.5px; font-weight:600;
     padding:9px 14px; border-radius:9px; z-index:30; display:none; box-shadow:var(--shadow-sm);
   }
-  .place-hint.show{ display:block; }
+  .place-hint.show{ display:flex; }
 
   .legend{
-    position:absolute; bottom:14px; left:14px; background:var(--panel);
-    border:1px solid var(--border); border-radius:10px; padding:11px 16px;
-    display:flex; gap:16px; font-size:14px; font-weight:500; color:var(--text-muted); z-index:20;
-    box-shadow:var(--shadow-sm); flex-wrap:wrap; max-width:calc(100% - 28px);
+    flex:0 0 auto; position:relative; background:var(--panel);
+    border-top:1px solid var(--border); padding:11px 16px;
+    display:flex; gap:16px; font-size:14px; font-weight:500; color:var(--text-muted);
+    flex-wrap:wrap; max-height:110px; overflow-y:auto;
   }
   .legend span{ display:flex; align-items:center; gap:7px; }
-  .legend .dot{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .legend .dot{ width:11px; height:11px; border-radius:50%; display:inline-block; flex-shrink:0; }
 
   /* ---------- Pins ---------- */
   .pin{ position:absolute; transform:translate(-50%,-50%); z-index:10; cursor:pointer; }
@@ -177,8 +182,9 @@
 
   /* ---------- Sidebar ---------- */
   .sidebar{
-    flex:0 0 32%; max-width:400px; min-width:280px; border-left:1px solid var(--border);
+    flex:0 0 32%; max-width:400px; min-width:280px; border-right:1px solid var(--border);
     background:var(--panel); display:flex; flex-direction:column; min-height:0;
+    order:-1;
   }
   .sidebar-head{ padding:16px 18px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
   .sidebar-head h2{ font-size:17px; font-weight:800; color:var(--text); }
@@ -366,7 +372,7 @@
 
   @media (max-width:820px){
     .main{ flex-direction:column; }
-    .sidebar{ max-width:none; flex:1 1 40%; border-left:none; border-top:1px solid var(--border); }
+    .sidebar{ max-width:none; flex:1 1 40%; border-left:none; border-right:none; border-top:1px solid var(--border); order:0; }
     .map-wrap{ flex:1 1 55%; min-height:280px; }
   }
 </style>
@@ -402,26 +408,32 @@
 
   <div class="main">
     <div class="map-wrap" id="map-wrap">
-      <div class="map-scroll" id="map-scroll">
-        <div class="map-canvas" id="map-canvas"></div>
-      </div>
-
-      <div class="map-empty" id="map-empty">
-        <div class="empty-box">
-          <div class="icon">🛰️</div>
-          <h3 id="empty-title">위성지도를 업로드하세요</h3>
-          <p id="empty-desc">구글맵 또는 네이버맵에서 현장을 위성/항공 뷰로 띄운 뒤 화면을 캡처해서 올려주세요. 이후엔 계속 저장되어 다시 올릴 필요 없어요.</p>
-          <button class="btn primary admin-only" id="empty-upload-btn" style="display:none;">이미지 업로드</button>
+      <div class="map-viewport">
+        <div class="map-scroll" id="map-scroll">
+          <div class="map-canvas" id="map-canvas"></div>
         </div>
+
+        <div class="map-empty" id="map-empty">
+          <div class="empty-box">
+            <div class="icon">🛰️</div>
+            <h3 id="empty-title">위성지도를 업로드하세요</h3>
+            <p id="empty-desc">구글맵 또는 네이버맵에서 현장을 위성/항공 뷰로 띄운 뒤 화면을 캡처해서 올려주세요. 이후엔 계속 저장되어 다시 올릴 필요 없어요.</p>
+            <button class="btn primary admin-only" id="empty-upload-btn" style="display:none;">이미지 업로드</button>
+          </div>
+        </div>
+
+        <div class="place-hint" id="place-hint" style="align-items:center; gap:10px;">
+          <span id="place-hint-text">지도를 클릭해서 위치를 지정하세요</span>
+          <button id="place-hint-cancel" type="button" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
+        </div>
+        <div class="place-hint" id="area-draw-hint" style="display:none; align-items:center; gap:10px;">
+          <span>지도를 드래그해서 작업범위를 표시하세요</span>
+          <button id="area-draw-cancel" type="button" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
+        </div>
+        <div class="upload-status" id="upload-status"></div>
+        <div class="map-toolbar" id="map-toolbar" style="display:none;"></div>
       </div>
 
-      <div class="place-hint" id="place-hint">지도를 클릭해서 위치를 지정하세요</div>
-      <div class="place-hint" id="area-draw-hint" style="display:none; align-items:center; gap:10px;">
-        <span>지도를 드래그해서 작업범위를 표시하세요</span>
-        <button id="area-draw-cancel" type="button" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
-      </div>
-      <div class="upload-status" id="upload-status"></div>
-      <div class="map-toolbar" id="map-toolbar" style="display:none;"></div>
       <div class="legend" id="legend" style="display:none;"></div>
     </div>
 
@@ -690,6 +702,7 @@ const db = getFirestore(fbApp);
 
   let placing = false;
   let placingFromWorkModal = false;
+  let repositioningZoneId = null;
   let unsubWorks = null;
   let siteNameFromRemote = '';
   let suppressSiteNameEcho = false;
@@ -1080,11 +1093,24 @@ const db = getFirestore(fbApp);
     hideWorkPage();
     zoneManageBackdrop.classList.remove('show');
   }
+  function startRepositioning(zoneId){
+    if(!mapImageURL) return;
+    repositioningZoneId = zoneId;
+    placing = true;
+    $('place-hint-text').textContent = '지도를 클릭해서 새 위치를 지정하세요';
+    placeHint.classList.add('show');
+    mapWrap.classList.add('place-cursor');
+    hideWorkPage();
+    zoneManageBackdrop.classList.remove('show');
+  }
   function cancelPlacing(){
     placing = false;
+    repositioningZoneId = null;
+    $('place-hint-text').textContent = '지도를 클릭해서 위치를 지정하세요';
     placeHint.classList.remove('show');
     mapWrap.classList.remove('place-cursor');
   }
+  $('place-hint-cancel').addEventListener('click', cancelPlacing);
 
   function onMapClick(e){
     if(!placing) return;
@@ -1092,6 +1118,22 @@ const db = getFirestore(fbApp);
     const rect = imgEl.getBoundingClientRect();
     const xPct = ((e.clientX - rect.left) / rect.width) * 100;
     const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+
+    if(repositioningZoneId){
+      const zoneId = repositioningZoneId;
+      cancelPlacing();
+      (async ()=>{
+        try{
+          await updateDoc(doc(db,'zones',zoneId), { xPct, yPct });
+          const z = zones.find(x=>x.id===zoneId);
+          if(z){ z.xPct = xPct; z.yPct = yPct; }
+          renderAllPins();
+        }catch(e){ console.error('zone reposition failed', e); }
+        openZoneManageModal();
+      })();
+      return;
+    }
+
     cancelPlacing();
     openZoneNameModal(xPct, yPct);
   }
@@ -1172,9 +1214,13 @@ const db = getFirestore(fbApp);
       row.className = 'zone-row';
       row.innerHTML = `<span class="name">📍 ${escapeHTML(z.name)}</span>
         <span class="zone-actions">
+          <button data-act="move" title="위치 이동">📌</button>
           <button data-act="rename" title="이름변경">✏️</button>
           <button data-act="delete" title="삭제">🗑️</button>
         </span>`;
+      row.querySelector('[data-act="move"]').addEventListener('click', ()=>{
+        startRepositioning(z.id);
+      });
       row.querySelector('[data-act="rename"]').addEventListener('click', ()=>{
         pendingRenameId = z.id;
         renameMode = true;
@@ -1721,4 +1767,3 @@ const db = getFirestore(fbApp);
 
 </body>
 </html>
-
