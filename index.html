@@ -1519,9 +1519,29 @@ const db = getFirestore(fbApp);
       mapCanvas.appendChild(rect);
     });
 
+    // 작업범위(빨간 영역)를 직접 그린 작업은, 업체(색깔)별로 각자 자기 범위 위에
+    // 개별 핀으로 표시한다 (다른 업체 인원과 합쳐지지 않도록).
+    const worksWithArea = markers.filter(m => m.area);
+    worksWithArea.forEach(m=>{
+      const zone = zones.find(z=>z.id===m.zoneId);
+      const pinX = (m.area.x1 + m.area.x2) / 2;
+      const pinY = (m.area.y1 + m.area.y2) / 2;
+      const pinColor = companyColor(m.company);
+      const pin = document.createElement('div');
+      pin.className = 'pin' + (m.risk === 'high' ? ' has-warn' : '');
+      pin.style.left = pinX + '%';
+      pin.style.top = pinY + '%';
+      const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
+      const labelText = [m.company, zone ? zone.name : ''].filter(Boolean).join(' · ');
+      pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || '작업')}</div>`;
+      pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkModal(m.id); });
+      mapCanvas.appendChild(pin);
+    });
+
+    // 작업범위를 그리지 않은 작업들은 기존처럼 위치(구역) 단위로 합쳐서 표시한다.
     zones.forEach(zone=>{
-      const worksHere = markers.filter(m=>m.zoneId === zone.id);
-      if(worksHere.length === 0){
+      const allWorksHere = markers.filter(m=>m.zoneId === zone.id);
+      if(allWorksHere.length === 0){
         const dot = document.createElement('div');
         dot.className = 'zone-dot';
         dot.style.left = zone.xPct + '%';
@@ -1531,21 +1551,19 @@ const db = getFirestore(fbApp);
         mapCanvas.appendChild(dot);
         return;
       }
+
+      const worksHere = allWorksHere.filter(m => !m.area);
+      if(worksHere.length === 0) return; // 이 위치의 작업은 전부 위에서 개별 범위 핀으로 이미 표시됨
+
       const totalPeople = worksHere.reduce((s,m)=>s+(Number(m.people)||0),0);
       const highCount = worksHere.filter(m=>m.risk==='high').length;
       const companies = [...new Set(worksHere.map(m=>m.company).filter(Boolean))];
       const pinColor = companies.length === 1 ? companyColor(companies[0]) : (companies.length === 0 ? '#9CA3AF' : '#1A1D23');
 
-      // 작업범위(빨간 영역)가 그려진 작업이 있으면, 핀을 위치 등록 지점이 아니라
-      // 그 작업범위의 정중앙에 표시한다.
-      const areaWork = worksHere.find(m => m.area);
-      const pinX = areaWork ? (areaWork.area.x1 + areaWork.area.x2) / 2 : zone.xPct;
-      const pinY = areaWork ? (areaWork.area.y1 + areaWork.area.y2) / 2 : zone.yPct;
-
       const pin = document.createElement('div');
       pin.className = 'pin' + (highCount > 0 ? ' has-warn' : '');
-      pin.style.left = pinX + '%';
-      pin.style.top = pinY + '%';
+      pin.style.left = zone.xPct + '%';
+      pin.style.top = zone.yPct + '%';
       const labelExtra = worksHere.length > 1 ? ` 외 ${worksHere.length-1}건` : '';
       const warnBadge = highCount > 0 ? `<div class="pin-warn">⚠${highCount}</div>` : '';
       pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${totalPeople}</div>${warnBadge}<div class="pin-label">${escapeHTML(zone.name)}${labelExtra}</div>`;
