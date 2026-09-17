@@ -583,13 +583,16 @@
         <button class="chip" data-risk="low" type="button">저위험</button>
       </div>
 
-      <button class="btn admin-only" id="bulk-select-toggle" style="display:none; margin-bottom:14px;">☑️&nbsp; 일괄 작업 완료</button>
+      <div class="field-row admin-only" style="display:none; margin-bottom:14px;">
+        <button class="btn" id="bulk-select-toggle" style="flex:1;">☑️&nbsp; 일괄 작업 완료</button>
+        <button class="btn danger" id="bulk-delete-toggle" style="flex:1;">🗑️&nbsp; 일괄 삭제</button>
+      </div>
 
       <div class="bulk-bar" id="bulk-bar" style="display:none;">
         <span id="bulk-count">0건 선택됨</span>
         <div style="display:flex; gap:8px;">
           <button class="btn" id="bulk-cancel-btn">취소</button>
-          <button class="btn primary" id="bulk-complete-btn">완료 처리</button>
+          <button class="btn primary" id="bulk-action-btn">완료 처리</button>
         </div>
       </div>
 
@@ -1907,11 +1910,20 @@ const db = getFirestore(fbApp);
   $('export-weekly-btn').addEventListener('click', ()=> exportWorksExcel('weekly'));
   $('export-monthly-btn').addEventListener('click', ()=> exportWorksExcel('monthly'));
 
-  // ---------------- bulk complete (admin only) ----------------
+  // ---------------- bulk complete / bulk delete (admin only) ----------------
   let bulkSelectMode = false;
+  let bulkMode = 'complete'; // 'complete' | 'delete'
   let bulkSelectedIds = new Set();
 
   $('bulk-select-toggle').addEventListener('click', ()=>{
+    bulkMode = 'complete';
+    bulkSelectMode = true;
+    bulkSelectedIds.clear();
+    updateBulkBar();
+    renderStatusList();
+  });
+  $('bulk-delete-toggle').addEventListener('click', ()=>{
+    bulkMode = 'delete';
     bulkSelectMode = true;
     bulkSelectedIds.clear();
     updateBulkBar();
@@ -1923,12 +1935,20 @@ const db = getFirestore(fbApp);
     updateBulkBar();
     renderStatusList();
   });
-  $('bulk-complete-btn').addEventListener('click', async ()=>{
+  $('bulk-action-btn').addEventListener('click', async ()=>{
     if(bulkSelectedIds.size === 0) return;
     const ids = [...bulkSelectedIds];
-    try{
-      await Promise.all(ids.map(id => updateDoc(doc(db,'works',id), { status:'done' })));
-    }catch(e){ console.error('bulk complete failed', e); }
+    if(bulkMode === 'delete'){
+      const ok = confirm(`선택한 작업 ${ids.length}건을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.`);
+      if(!ok) return;
+      try{
+        await Promise.all(ids.map(id => deleteDoc(doc(db,'works',id))));
+      }catch(e){ console.error('bulk delete failed', e); }
+    } else {
+      try{
+        await Promise.all(ids.map(id => updateDoc(doc(db,'works',id), { status:'done' })));
+      }catch(e){ console.error('bulk complete failed', e); }
+    }
     bulkSelectMode = false;
     bulkSelectedIds.clear();
     updateBulkBar();
@@ -1938,7 +1958,17 @@ const db = getFirestore(fbApp);
     const bar = $('bulk-bar');
     bar.style.display = bulkSelectMode ? 'flex' : 'none';
     $('bulk-count').textContent = bulkSelectedIds.size + '건 선택됨';
-    $('bulk-complete-btn').disabled = bulkSelectedIds.size === 0;
+    const actionBtn = $('bulk-action-btn');
+    actionBtn.disabled = bulkSelectedIds.size === 0;
+    if(bulkMode === 'delete'){
+      actionBtn.textContent = '삭제';
+      actionBtn.classList.remove('primary');
+      actionBtn.classList.add('danger');
+    } else {
+      actionBtn.textContent = '완료 처리';
+      actionBtn.classList.remove('danger');
+      actionBtn.classList.add('primary');
+    }
   }
 
   document.querySelectorAll('.risk-choice button').forEach(btn=>{
