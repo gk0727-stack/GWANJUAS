@@ -311,10 +311,10 @@
   }
   .area-chip-remove:hover{ color:var(--high); }
   .wd-map-wrap{
-    position:relative; width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden;
-    background:var(--panel-2); border:1px solid var(--border);
+    position:relative; width:100%; border-radius:10px; overflow:hidden;
+    background:var(--panel-2); border:1px solid var(--border); line-height:0;
   }
-  .wd-map-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .wd-map-wrap img{ width:100%; height:auto; display:block; }
   .wd-map-wrap .area-overlay{ position:absolute; }
   .wd-map-dot{
     position:absolute; width:16px; height:16px; border-radius:50%; border:2.5px solid #fff;
@@ -706,7 +706,7 @@
 
 <!-- Work detail (view) modal -->
 <div class="modal-backdrop" id="work-detail-backdrop">
-  <div class="modal">
+  <div class="modal" style="max-width:480px;">
     <button class="btn modal-close-x" id="work-detail-close">✕</button>
     <div style="display:flex; gap:8px; margin-bottom:12px;">
       <span class="badge" id="wd-risk-badge"></span>
