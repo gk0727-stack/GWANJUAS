@@ -2063,9 +2063,17 @@ const db = getFirestore(fbApp);
 
     // 핀 크기: 화면(지도) 크기 대비 그려진 작업범위(빨간 영역) 비율에 맞춰 축소.
     // 범위가 없는 핀은 지도 폭 기준으로만 축소(모바일에서 너무 크게 보이지 않도록).
+    // 모바일과 PC는 화면 대비 핀이 차지하는 비율 자체를 다르게 둬서, 모바일에서 더 작게 보이게 한다.
     const canvasRectForPins = mapCanvas.getBoundingClientRect();
     const canvasWpx = canvasRectForPins.width || mapCanvas.offsetWidth || 1;
     const canvasHpx = canvasRectForPins.height || mapCanvas.offsetHeight || 1;
+    const isMobileView = window.innerWidth <= 820;
+    // PC는 맨 처음 크기 그대로, 모바일만 조금 더 키운 값
+    const AREA_PIN_RATIO = isMobileView ? 0.38 : 0.6;
+    const NO_AREA_PIN_RATIO = isMobileView ? 0.028 : 0.045;
+    const PIN_MAX_PX = isMobileView ? 40 : 56;
+    const PIN_MIN_AREA_PX = isMobileView ? 18 : 26;
+    const PIN_MIN_NOAREA_PX = isMobileView ? 20 : 30;
 
     function makePin(m, zone, pinX, pinY, areaForSize){
       const pinColor = companyColor(m.company);
@@ -2078,9 +2086,9 @@ const db = getFirestore(fbApp);
         const areaWpx = ((areaForSize.x2 - areaForSize.x1) / 100) * canvasWpx;
         const areaHpx = ((areaForSize.y2 - areaForSize.y1) / 100) * canvasHpx;
         const minSide = Math.max(0, Math.min(areaWpx, areaHpx));
-        pinSizePx = Math.max(18, Math.min(42, minSide * 0.42));
+        pinSizePx = Math.max(PIN_MIN_AREA_PX, Math.min(PIN_MAX_PX, minSide * AREA_PIN_RATIO));
       } else {
-        pinSizePx = Math.max(20, Math.min(42, canvasWpx * 0.03));
+        pinSizePx = Math.max(PIN_MIN_NOAREA_PX, Math.min(PIN_MAX_PX, canvasWpx * NO_AREA_PIN_RATIO));
       }
       pin.style.setProperty('--pin-size', pinSizePx.toFixed(1) + 'px');
       const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
