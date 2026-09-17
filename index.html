@@ -169,7 +169,7 @@
   .pin{ position:absolute; transform:translate(-50%,-50%); z-index:10; cursor:pointer; --pin-size:56px; }
   .pin-circle{
     width:var(--pin-size,56px); height:var(--pin-size,56px); border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:calc(var(--pin-size,56px) * 0.34); font-weight:800; color:#fff; border:calc(var(--pin-size,56px) * 0.0625) solid #fff;
+    font-size:max(10px, calc(var(--pin-size,56px) * 0.34)); font-weight:800; color:#fff; border:max(2px, calc(var(--pin-size,56px) * 0.0625)) solid #fff;
     box-shadow:0 3px 10px rgba(16,24,40,0.35);
   }
   .pin.has-warn::before{
@@ -405,7 +405,7 @@
   /* ---------- Pin risk badge (company-colored pins) ---------- */
   .pin-warn{
     position:absolute; top:calc(var(--pin-size,56px) * -0.14); right:calc(var(--pin-size,56px) * -0.18); background:var(--high); color:#fff;
-    font-size:calc(var(--pin-size,56px) * 0.22); font-weight:800; min-width:calc(var(--pin-size,56px) * 0.43); height:calc(var(--pin-size,56px) * 0.43); border-radius:50%;
+    font-size:max(9px, calc(var(--pin-size,56px) * 0.22)); font-weight:800; min-width:max(15px, calc(var(--pin-size,56px) * 0.43)); height:max(15px, calc(var(--pin-size,56px) * 0.43)); border-radius:50%;
     display:flex; align-items:center; justify-content:center; padding:0 5px;
     border:2.5px solid #fff; box-shadow:0 1px 3px rgba(16,24,40,0.3);
   }
@@ -2040,9 +2040,9 @@ const db = getFirestore(fbApp);
         const areaWpx = ((m.area.x2 - m.area.x1) / 100) * canvasWpx;
         const areaHpx = ((m.area.y2 - m.area.y1) / 100) * canvasHpx;
         const minSide = Math.max(0, Math.min(areaWpx, areaHpx));
-        pinSizePx = Math.max(26, Math.min(56, minSide * 0.6));
+        pinSizePx = Math.max(18, Math.min(42, minSide * 0.42));
       } else {
-        pinSizePx = Math.max(30, Math.min(56, canvasWpx * 0.045));
+        pinSizePx = Math.max(20, Math.min(42, canvasWpx * 0.03));
       }
       pin.style.setProperty('--pin-size', pinSizePx.toFixed(1) + 'px');
       const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
