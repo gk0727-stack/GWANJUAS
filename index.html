@@ -299,6 +299,17 @@
   .loc-row{ display:flex; gap:8px; }
   .loc-row select{ flex:1; }
   .hint-text{ font-size:14px; color:var(--text-dim); margin-top:7px; line-height:1.6; }
+  .area-chip-list{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+  .area-chip{
+    display:inline-flex; align-items:center; gap:5px; background:var(--bg, #F3F4F6);
+    border:1px solid var(--border); border-radius:14px; padding:3px 4px 3px 10px;
+    font-size:13px; font-weight:600; color:var(--text);
+  }
+  .area-chip-remove{
+    background:none; border:none; color:var(--text-dim); font-size:15px; font-weight:800;
+    cursor:pointer; padding:0 5px; line-height:1;
+  }
+  .area-chip-remove:hover{ color:var(--high); }
   .req-mark{ color:var(--high); font-weight:700; }
 
   /* zone manage list */
@@ -480,8 +491,9 @@
           <span id="place-hint-text" data-i18n="place_hint_default">지도를 클릭해서 위치를 지정하세요</span>
           <button id="place-hint-cancel" type="button" data-i18n="cancel" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
         </div>
-        <div class="place-hint" id="area-draw-hint" style="display:none; align-items:center; gap:10px;">
-          <span data-i18n="area_draw_hint">지도를 드래그해서 작업범위를 표시하세요</span>
+        <div class="place-hint" id="area-draw-hint" style="display:none; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span id="area-draw-hint-text" data-i18n="area_draw_hint">지도를 드래그해서 작업범위를 표시하세요</span>
+          <button id="area-draw-done" type="button" data-i18n="area_draw_done" style="background:#1D4ED8;border:none;color:#fff;font-weight:800;font-size:14px;padding:5px 14px;border-radius:7px;">완료</button>
           <button id="area-draw-cancel" type="button" data-i18n="cancel" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
         </div>
         <div class="upload-status" id="upload-status"></div>
@@ -808,6 +820,8 @@ const db = getFirestore(fbApp);
       place_hint_default: "지도를 클릭해서 위치를 지정하세요",
       cancel: "취소",
       area_draw_hint: "지도를 드래그해서 작업범위를 표시하세요",
+      area_draw_hint_more: (count) => `계속 드래그해서 범위를 추가하거나, 완료를 누르세요 (${count}개 추가됨)`,
+      area_draw_done: "완료",
       sidebar_title: "주요 작업목록",
       sidebar_subtitle: "고위험 작업만 표시됩니다",
       stat_total_people: "총 출역 인원",
@@ -882,9 +896,11 @@ const db = getFirestore(fbApp);
       mp_admin_off: "🔓  관리자 모드 끄기",
       status_done: "완료",
       status_inprogress: "진행중",
-      area_set_msg: "범위가 지정되었습니다.",
-      area_clear_link: "지우기",
+      area_set_msg: (count) => count > 1 ? `범위 ${count}개가 지정되었습니다.` : "범위가 지정되었습니다.",
+      area_clear_link: "전체 지우기",
       area_redraw_btn: "🗺️ 범위 다시 그리기",
+      area_add_more_btn: "🗺️ 범위 추가로 그리기",
+      area_chip_label: (i) => `범위 ${i}`,
       zone_manage_empty: "등록된 위치가 없습니다.",
       title_move: "위치 이동",
       title_rename: "이름 변경",
@@ -935,6 +951,8 @@ const db = getFirestore(fbApp);
       place_hint_default: "请点击地图以指定位置",
       cancel: "取消",
       area_draw_hint: "请拖动地图以标出作业范围",
+      area_draw_hint_more: (count) => `继续拖动以添加更多范围，或点击完成 (已添加 ${count} 个)`,
+      area_draw_done: "完成",
       sidebar_title: "主要作业列表",
       sidebar_subtitle: "仅显示高风险作业",
       stat_total_people: "总出勤人数",
@@ -1009,9 +1027,11 @@ const db = getFirestore(fbApp);
       mp_admin_off: "🔓  关闭管理员模式",
       status_done: "已完成",
       status_inprogress: "进行中",
-      area_set_msg: "已设置作业范围。",
-      area_clear_link: "清除",
+      area_set_msg: (count) => count > 1 ? `已设置 ${count} 个作业范围。` : "已设置作业范围。",
+      area_clear_link: "全部清除",
       area_redraw_btn: "🗺️ 重新绘制范围",
+      area_add_more_btn: "🗺️ 添加更多范围",
+      area_chip_label: (i) => `范围 ${i}`,
       zone_manage_empty: "尚未登记位置。",
       title_move: "移动位置",
       title_rename: "重命名",
@@ -1062,6 +1082,8 @@ const db = getFirestore(fbApp);
       place_hint_default: "Click the map to set a location",
       cancel: "Cancel",
       area_draw_hint: "Drag on the map to mark the work area",
+      area_draw_hint_more: (count) => `Keep dragging to add more areas, or tap Done (${count} added)`,
+      area_draw_done: "Done",
       sidebar_title: "Key work list",
       sidebar_subtitle: "Only high-risk work is shown",
       stat_total_people: "Total workers",
@@ -1136,9 +1158,11 @@ const db = getFirestore(fbApp);
       mp_admin_off: "🔓  Turn off admin mode",
       status_done: "Done",
       status_inprogress: "In progress",
-      area_set_msg: "Area has been set.",
-      area_clear_link: "Clear",
+      area_set_msg: (count) => count > 1 ? `${count} areas have been set.` : "Area has been set.",
+      area_clear_link: "Clear all",
       area_redraw_btn: "🗺️ Redraw area",
+      area_add_more_btn: "🗺️ Draw another area",
+      area_chip_label: (i) => `Area ${i}`,
       zone_manage_empty: "No locations registered.",
       title_move: "Move location",
       title_rename: "Rename",
@@ -1365,7 +1389,7 @@ const db = getFirestore(fbApp);
         try{
           await addDoc(collection(db,'works'), {
             date: currentDate, zoneId: '', workType, people: 0, time: '',
-            company, supervisor: '', note: '', area: null,
+            company, supervisor: '', note: '', area: null, areas: null,
             status: 'in_progress', risk, createdAt: Date.now()
           });
           success++;
@@ -1587,31 +1611,48 @@ const db = getFirestore(fbApp);
     imgEl.src = mapImageURL;
   }
 
-  // ---------------- work-area drawing (drag a rectangle on the map) ----------------
-  let drawingArea = false;
+  // ---------------- work-area drawing (drag one or more rectangles on the map) ----------------
+  let drawingArea = false; // 지도 위에서 범위 그리기 세션이 진행 중인지 (완료/취소를 누를 때까지 유지)
   let areaDrawFromWorkModal = false;
   let areaDrawImgRect = null;
   let areaDrawStartPct = null;
   let liveAreaRectEl = null;
-  let pendingArea = null; // {x1,y1,x2,y2} in percent, 0-100
+  let pendingAreas = []; // [{x1,y1,x2,y2}, ...] in percent, 0-100 — 이 작업의 모든 범위
+  let areaDrawSessionStartCount = 0; // 그리기 세션 시작 시점의 개수 (취소 시 이 개수로 되돌림)
 
+  function updateAreaDrawHintText(){
+    const span = $('area-draw-hint-text');
+    span.textContent = pendingAreas.length ? t('area_draw_hint_more')(pendingAreas.length) : t('area_draw_hint');
+  }
   function startAreaDrawing(){
     if(!mapImageURL) return;
     drawingArea = true;
     areaDrawFromWorkModal = true;
+    areaDrawSessionStartCount = pendingAreas.length;
+    updateAreaDrawHintText();
     $('area-draw-hint').style.display = 'flex';
     mapWrap.classList.add('area-drawing');
     hideWorkPage();
   }
-  function cancelAreaDrawing(){
+  function exitAreaDrawingUI(){
     drawingArea = false;
     areaDrawStartPct = null;
     $('area-draw-hint').style.display = 'none';
     mapWrap.classList.remove('area-drawing');
     if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
+  }
+  function finishAreaDrawing(){
+    exitAreaDrawingUI();
+    updateAreaStatusText();
     if(areaDrawFromWorkModal) showWorkPage();
   }
+  function cancelAreaDrawing(){
+    // 이번 그리기 세션에서 새로 추가한 범위만 취소하고, 이전에 이미 있던 범위는 유지
+    pendingAreas = pendingAreas.slice(0, areaDrawSessionStartCount);
+    finishAreaDrawing();
+  }
   $('area-draw-cancel').addEventListener('click', cancelAreaDrawing);
+  $('area-draw-done').addEventListener('click', finishAreaDrawing);
 
   function pctFromEvent(e){
     const x = ((e.clientX - areaDrawImgRect.left) / areaDrawImgRect.width) * 100;
@@ -1647,31 +1688,37 @@ const db = getFirestore(fbApp);
     const x1 = Math.min(areaDrawStartPct.x, cur.x), x2 = Math.max(areaDrawStartPct.x, cur.x);
     const y1 = Math.min(areaDrawStartPct.y, cur.y), y2 = Math.max(areaDrawStartPct.y, cur.y);
     areaDrawStartPct = null;
+    if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
 
     if((x2-x1) < 2 || (y2-y1) < 2){
-      // too small, likely an accidental tap — remove and let them try again
-      if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
+      // too small, likely an accidental tap — ignore and keep drawing mode active so they can retry
       return;
     }
 
-    pendingArea = { x1, y1, x2, y2 };
-    drawingArea = false;
-    $('area-draw-hint').style.display = 'none';
-    mapWrap.classList.remove('area-drawing');
-    if(liveAreaRectEl){ liveAreaRectEl.remove(); liveAreaRectEl = null; }
-    updateAreaStatusText();
-    if(areaDrawFromWorkModal) showWorkPage();
+    pendingAreas.push({ x1, y1, x2, y2 });
+    updateAreaDrawHintText();
+    // 계속 그리기 모드를 유지 — 이어서 드래그하면 범위가 더 추가되고, "완료"를 눌러야 끝남
   }
 
   function updateAreaStatusText(){
     const el = $('area-status-text');
     const btn = $('draw-area-btn');
-    if(pendingArea){
+    if(pendingAreas.length){
       el.style.display = 'block';
-      el.innerHTML = `✅ ${t('area_set_msg')} <a href="#" id="area-clear-link" style="color:var(--high); font-weight:600;">${t('area_clear_link')}</a>`;
-      btn.textContent = t('area_redraw_btn');
+      const chips = pendingAreas.map((a,i)=>
+        `<span class="area-chip">${escapeHTML(t('area_chip_label')(i+1))}<button type="button" class="area-chip-remove" data-idx="${i}" aria-label="remove">×</button></span>`
+      ).join('');
+      el.innerHTML = `✅ ${t('area_set_msg')(pendingAreas.length)}<div class="area-chip-list">${chips}</div><a href="#" id="area-clear-link" style="color:var(--high); font-weight:600;">${t('area_clear_link')}</a>`;
+      btn.textContent = t('area_add_more_btn');
       const clearLink = $('area-clear-link');
-      if(clearLink) clearLink.addEventListener('click', (e)=>{ e.preventDefault(); pendingArea = null; updateAreaStatusText(); });
+      if(clearLink) clearLink.addEventListener('click', (e)=>{ e.preventDefault(); pendingAreas = []; updateAreaStatusText(); });
+      el.querySelectorAll('.area-chip-remove').forEach(rmBtn=>{
+        rmBtn.addEventListener('click', (e)=>{
+          e.preventDefault();
+          pendingAreas.splice(Number(rmBtn.dataset.idx), 1);
+          updateAreaStatusText();
+        });
+      });
     } else {
       el.style.display = 'none';
       btn.textContent = t('draw_area_btn');
@@ -1968,34 +2015,44 @@ const db = getFirestore(fbApp);
     return COMPANY_PALETTE[hash % COMPANY_PALETTE.length];
   }
 
+  // 하위호환: 예전 문서는 area(단일 객체) 하나만 있고, 새 문서는 areas(배열)를 가진다.
+  function getMarkerAreas(m){
+    if(m.areas && m.areas.length) return m.areas;
+    if(m.area) return [m.area];
+    return [];
+  }
+
   function renderAllPins(){
     mapCanvas.querySelectorAll('.pin, .zone-dot, .area-overlay').forEach(p=>p.remove());
     if(!mapImageURL){ renderLegend(); return; }
 
     const riskColorVar = { high:'var(--high)', mid:'var(--mid)', low:'var(--low)' };
     markers.forEach(m=>{
-      if(!m.area) return;
-      const rect = document.createElement('div');
-      rect.className = 'area-overlay';
-      const color = riskColorVar[m.risk] || 'var(--text-dim)';
-      rect.style.left = m.area.x1 + '%';
-      rect.style.top = m.area.y1 + '%';
-      rect.style.width = (m.area.x2 - m.area.x1) + '%';
-      rect.style.height = (m.area.y2 - m.area.y1) + '%';
-      rect.style.borderColor = color;
-      rect.style.background = 'color-mix(in srgb, ' + color + ' 16%, transparent)';
-      mapCanvas.appendChild(rect);
+      const areasM = getMarkerAreas(m);
+      areasM.forEach(a=>{
+        const rect = document.createElement('div');
+        rect.className = 'area-overlay';
+        const color = riskColorVar[m.risk] || 'var(--text-dim)';
+        rect.style.left = a.x1 + '%';
+        rect.style.top = a.y1 + '%';
+        rect.style.width = (a.x2 - a.x1) + '%';
+        rect.style.height = (a.y2 - a.y1) + '%';
+        rect.style.borderColor = color;
+        rect.style.background = 'color-mix(in srgb, ' + color + ' 16%, transparent)';
+        mapCanvas.appendChild(rect);
+      });
     });
 
     // 모든 작업은 절대 합산하지 않고, 업체(색깔)별로 각자 개별 핀으로 표시한다.
-    // - 작업범위(빨간 영역)를 그렸으면 그 범위의 정중앙
+    // - 작업범위(빨간 영역)를 그렸으면 그 범위마다 각각 핀 하나씩(같은 작업이 여러 범위에
+    //   걸쳐 있으면 그 개수만큼 핀이 표시됨)
     // - 안 그렸으면 등록된 위치(구역) 지점 (단, 같은 위치를 공유하는 작업이 여럿이면
     //   완전히 겹치지 않도록 살짝 부채꼴로 펼쳐서 배치한다)
     const noAreaGroupIndex = new Map(); // workId -> {idx, total}
     (function(){
       const byZone = new Map();
       markers.forEach(m=>{
-        if(m.area || !m.zoneId) return;
+        if(getMarkerAreas(m).length || !m.zoneId) return;
         if(!byZone.has(m.zoneId)) byZone.set(m.zoneId, []);
         byZone.get(m.zoneId).push(m);
       });
@@ -2010,35 +2067,16 @@ const db = getFirestore(fbApp);
     const canvasWpx = canvasRectForPins.width || mapCanvas.offsetWidth || 1;
     const canvasHpx = canvasRectForPins.height || mapCanvas.offsetHeight || 1;
 
-    markers.forEach(m=>{
-      const zone = zones.find(z=>z.id===m.zoneId);
-      let pinX, pinY;
-      if(m.area){
-        pinX = (m.area.x1 + m.area.x2) / 2;
-        pinY = (m.area.y1 + m.area.y2) / 2;
-      } else if(zone){
-        const g = noAreaGroupIndex.get(m.id);
-        if(g && g.total > 1){
-          const angle = (g.idx * 137.5) * Math.PI / 180; // 골든 앵글로 겹치지 않게 분산
-          const radius = 3 + g.idx * 1.4;
-          pinX = zone.xPct + radius * Math.cos(angle);
-          pinY = zone.yPct + radius * Math.sin(angle);
-        } else {
-          pinX = zone.xPct;
-          pinY = zone.yPct;
-        }
-      } else {
-        return; // 위치 정보가 전혀 없는 작업(예: 위치 미지정으로 등록됨)은 지도에 표시하지 않음
-      }
+    function makePin(m, zone, pinX, pinY, areaForSize){
       const pinColor = companyColor(m.company);
       const pin = document.createElement('div');
       pin.className = 'pin' + (m.risk === 'high' ? ' has-warn' : '');
       pin.style.left = pinX + '%';
       pin.style.top = pinY + '%';
       let pinSizePx;
-      if(m.area){
-        const areaWpx = ((m.area.x2 - m.area.x1) / 100) * canvasWpx;
-        const areaHpx = ((m.area.y2 - m.area.y1) / 100) * canvasHpx;
+      if(areaForSize){
+        const areaWpx = ((areaForSize.x2 - areaForSize.x1) / 100) * canvasWpx;
+        const areaHpx = ((areaForSize.y2 - areaForSize.y1) / 100) * canvasHpx;
         const minSide = Math.max(0, Math.min(areaWpx, areaHpx));
         pinSizePx = Math.max(18, Math.min(42, minSide * 0.42));
       } else {
@@ -2050,6 +2088,33 @@ const db = getFirestore(fbApp);
       pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || t('work_fallback'))}</div>`;
       pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkModal(m.id); });
       mapCanvas.appendChild(pin);
+    }
+
+    markers.forEach(m=>{
+      const zone = zones.find(z=>z.id===m.zoneId);
+      const areasM = getMarkerAreas(m);
+      if(areasM.length){
+        // 범위를 여러 개 그렸으면 범위마다 핀을 하나씩 표시
+        areasM.forEach(a=>{
+          const pinX = (a.x1 + a.x2) / 2;
+          const pinY = (a.y1 + a.y2) / 2;
+          makePin(m, zone, pinX, pinY, a);
+        });
+      } else if(zone){
+        let pinX, pinY;
+        const g = noAreaGroupIndex.get(m.id);
+        if(g && g.total > 1){
+          const angle = (g.idx * 137.5) * Math.PI / 180; // 골든 앵글로 겹치지 않게 분산
+          const radius = 3 + g.idx * 1.4;
+          pinX = zone.xPct + radius * Math.cos(angle);
+          pinY = zone.yPct + radius * Math.sin(angle);
+        } else {
+          pinX = zone.xPct;
+          pinY = zone.yPct;
+        }
+        makePin(m, zone, pinX, pinY, null);
+      }
+      // 위치 정보가 전혀 없는 작업(예: 위치 미지정으로 등록됨)은 지도에 표시하지 않음
     });
 
     // 오늘 등록된 작업이 하나도 없는 위치(구역)만 회색 점으로 표시
@@ -2245,14 +2310,14 @@ const db = getFirestore(fbApp);
     updateRiskButtons();
     workStatus = (m && !duplicateFrom) ? (m.status || 'in_progress') : 'in_progress';
     updateStatusToggleBtn();
-    pendingArea = (m && m.area) ? { ...m.area } : null;
+    pendingAreas = m ? getMarkerAreas(m).map(a=>({ ...a })) : [];
     updateAreaStatusText();
     $('delete-btn').style.display = (m && !duplicateFrom) ? 'block' : 'none';
     $('work-form-error').style.display = 'none';
     showWorkPage();
     setActiveTab('add-work');
   }
-  function closeWorkModal(){ hideWorkPage(); editingId = null; pendingArea = null; setActiveTab('dashboard'); }
+  function closeWorkModal(){ hideWorkPage(); editingId = null; pendingAreas = []; setActiveTab('dashboard'); }
 
   $('page-back-btn').addEventListener('click', closeWorkModal);
   $('new-zone-from-work').addEventListener('click', ()=> requireAdmin(()=> startPlacing(true)));
@@ -2553,7 +2618,7 @@ const db = getFirestore(fbApp);
     const company = $('f-company').value.trim();
     const supervisor = [...document.querySelectorAll('#f-supervisor-checks input:checked')].map(el=>el.value).join(', ');
     const note = $('f-note').value.trim();
-    const area = pendingArea || null;
+    const areas = pendingAreas.length ? pendingAreas.map(a=>({ ...a })) : null;
     const status = workStatus;
 
     const errEl = $('work-form-error');
@@ -2574,10 +2639,10 @@ const db = getFirestore(fbApp);
 
     try{
       if(editingId){
-        await updateDoc(doc(db,'works',editingId), { zoneId, workType, people, time, company, supervisor, note, area, status, risk: selectedRisk });
+        await updateDoc(doc(db,'works',editingId), { zoneId, workType, people, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk });
       } else {
         await addDoc(collection(db,'works'), {
-          date: currentDate, zoneId, workType, people, time, company, supervisor, note, area, status, risk: selectedRisk, createdAt: Date.now()
+          date: currentDate, zoneId, workType, people, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk, createdAt: Date.now()
         });
       }
       closeWorkModal();
