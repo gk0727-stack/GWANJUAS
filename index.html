@@ -310,6 +310,16 @@
     cursor:pointer; padding:0 5px; line-height:1;
   }
   .area-chip-remove:hover{ color:var(--high); }
+  .wd-map-wrap{
+    position:relative; width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden;
+    background:var(--panel-2); border:1px solid var(--border);
+  }
+  .wd-map-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .wd-map-wrap .area-overlay{ position:absolute; }
+  .wd-map-dot{
+    position:absolute; width:16px; height:16px; border-radius:50%; border:2.5px solid #fff;
+    transform:translate(-50%,-50%); box-shadow:0 1px 5px rgba(16,24,40,0.45);
+  }
   .req-mark{ color:var(--high); font-weight:700; }
 
   /* zone manage list */
@@ -703,7 +713,14 @@
       <span class="badge" id="wd-status-badge"></span>
     </div>
     <h3 id="wd-title" style="margin-bottom:14px;"></h3>
-    <div id="wd-rows" style="display:flex; flex-direction:column; gap:11px; margin-bottom:20px;"></div>
+    <div id="wd-rows" style="display:flex; flex-direction:column; gap:11px; margin-bottom:16px;"></div>
+    <div id="wd-map-preview-wrap" style="display:none; margin-bottom:20px;">
+      <div class="hint-text" style="margin-top:0; margin-bottom:7px; font-weight:600;" data-i18n="wd_map_label">지도 위 작업범위</div>
+      <div class="wd-map-wrap">
+        <img id="wd-map-img" alt="">
+        <div id="wd-map-overlay"></div>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn primary" id="wd-complete-btn" style="width:100%; justify-content:center;"></button>
     </div>
@@ -963,7 +980,8 @@ const db = getFirestore(fbApp);
       wd_note: "메모",
       wd_complete_btn: "✅ 작업완료 처리",
       wd_reopen_btn: "🔵 진행중으로 변경",
-      wd_edit_link: "수정하기"
+      wd_edit_link: "수정하기",
+      wd_map_label: "지도 위 작업범위"
     },
     zh: {
       manage_title: "管理",
@@ -1103,7 +1121,8 @@ const db = getFirestore(fbApp);
       wd_note: "备注",
       wd_complete_btn: "✅ 标记为完成",
       wd_reopen_btn: "🔵 改为进行中",
-      wd_edit_link: "编辑"
+      wd_edit_link: "编辑",
+      wd_map_label: "地图上的作业范围"
     },
     en: {
       manage_title: "Manage",
@@ -1243,7 +1262,8 @@ const db = getFirestore(fbApp);
       wd_note: "Note",
       wd_complete_btn: "✅ Mark as complete",
       wd_reopen_btn: "🔵 Reopen (in progress)",
-      wd_edit_link: "Edit"
+      wd_edit_link: "Edit",
+      wd_map_label: "Work area on map"
     }
   };
 
@@ -2279,6 +2299,39 @@ const db = getFirestore(fbApp);
     } else {
       completeBtn.textContent = t('wd_complete_btn');
       completeBtn.classList.add('primary');
+    }
+
+    const previewWrap = $('wd-map-preview-wrap');
+    const areasM = getMarkerAreas(m);
+    if(mapImageURL && (areasM.length || zone)){
+      previewWrap.style.display = 'block';
+      $('wd-map-img').src = mapImageURL;
+      const overlay = $('wd-map-overlay');
+      overlay.innerHTML = '';
+      const riskColorVar = { high:'var(--high)', mid:'var(--mid)', low:'var(--low)' };
+      const color = riskColorVar[m.risk] || 'var(--text-dim)';
+      if(areasM.length){
+        areasM.forEach(a=>{
+          const rect = document.createElement('div');
+          rect.className = 'area-overlay';
+          rect.style.left = a.x1 + '%';
+          rect.style.top = a.y1 + '%';
+          rect.style.width = (a.x2 - a.x1) + '%';
+          rect.style.height = (a.y2 - a.y1) + '%';
+          rect.style.borderColor = color;
+          rect.style.background = 'color-mix(in srgb, ' + color + ' 22%, transparent)';
+          overlay.appendChild(rect);
+        });
+      } else if(zone){
+        const dot = document.createElement('div');
+        dot.className = 'wd-map-dot';
+        dot.style.left = zone.xPct + '%';
+        dot.style.top = zone.yPct + '%';
+        dot.style.background = color;
+        overlay.appendChild(dot);
+      }
+    } else {
+      previewWrap.style.display = 'none';
     }
 
     workDetailBackdrop.classList.add('show');
