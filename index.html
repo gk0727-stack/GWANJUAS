@@ -2071,9 +2071,9 @@ const db = getFirestore(fbApp);
     // PC는 맨 처음 크기 그대로, 모바일만 조금 더 키운 값
     const AREA_PIN_RATIO = isMobileView ? 0.38 : 0.6;
     const NO_AREA_PIN_RATIO = isMobileView ? 0.028 : 0.045;
-    const PIN_MAX_PX = isMobileView ? 40 : 56;
-    const PIN_MIN_AREA_PX = isMobileView ? 18 : 26;
-    const PIN_MIN_NOAREA_PX = isMobileView ? 20 : 30;
+    const PIN_MAX_PX = isMobileView ? 36 : 56;
+    const PIN_MIN_AREA_PX = isMobileView ? 24 : 26;
+    const PIN_MIN_NOAREA_PX = isMobileView ? 24 : 30;
 
     function makePin(m, zone, pinX, pinY, areaForSize){
       const pinColor = companyColor(m.company);
