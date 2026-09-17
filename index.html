@@ -694,6 +694,23 @@
   </div>
 </div>
 
+<!-- Work detail (view) modal -->
+<div class="modal-backdrop" id="work-detail-backdrop">
+  <div class="modal">
+    <button class="btn modal-close-x" id="work-detail-close">✕</button>
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <span class="badge" id="wd-risk-badge"></span>
+      <span class="badge" id="wd-status-badge"></span>
+    </div>
+    <h3 id="wd-title" style="margin-bottom:14px;"></h3>
+    <div id="wd-rows" style="display:flex; flex-direction:column; gap:11px; margin-bottom:20px;"></div>
+    <div class="modal-actions">
+      <button class="btn primary" id="wd-complete-btn" style="width:100%; justify-content:center;"></button>
+    </div>
+    <button type="button" id="wd-edit-link" class="admin-only" style="display:none; width:100%; text-align:center; background:none; border:none; margin-top:14px; padding:4px; color:var(--text-dim); font-size:13.5px; font-weight:600; text-decoration:underline; cursor:pointer;" data-i18n="wd_edit_link">수정하기</button>
+  </div>
+</div>
+
 <!-- Admin PIN modal -->
 <div class="modal-backdrop" id="admin-pin-backdrop">
   <div class="modal" style="max-width:300px;">
@@ -937,7 +954,16 @@ const db = getFirestore(fbApp);
       export_sheet_name: "작업목록",
       export_success: (startDate, endDate, count) => `✅ ${startDate} ~ ${endDate} 기간 ${count}건 내보내기 완료`,
       export_error: "⚠ 내보내기 중 오류가 발생했습니다.",
-      bulk_delete_confirm: (count) => `선택한 작업 ${count}건을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.`
+      bulk_delete_confirm: (count) => `선택한 작업 ${count}건을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.`,
+      wd_location: "위치",
+      wd_company: "업체 / 팀명",
+      wd_supervisor: "감시단 / 안전담당자",
+      wd_people: "투입 인원",
+      wd_time: "시간",
+      wd_note: "메모",
+      wd_complete_btn: "✅ 작업완료 처리",
+      wd_reopen_btn: "🔵 진행중으로 변경",
+      wd_edit_link: "수정하기"
     },
     zh: {
       manage_title: "管理",
@@ -1068,7 +1094,16 @@ const db = getFirestore(fbApp);
       export_sheet_name: "作业列表",
       export_success: (startDate, endDate, count) => `✅ 已导出${startDate} ~ ${endDate}期间共${count}件`,
       export_error: "⚠ 导出时发生错误。",
-      bulk_delete_confirm: (count) => `确定要删除已选择的${count}件作业吗？\n删除后将无法恢复。`
+      bulk_delete_confirm: (count) => `确定要删除已选择的${count}件作业吗？\n删除后将无法恢复。`,
+      wd_location: "位置",
+      wd_company: "企业 / 团队名",
+      wd_supervisor: "监视组 / 安全负责人",
+      wd_people: "投入人数",
+      wd_time: "时间",
+      wd_note: "备注",
+      wd_complete_btn: "✅ 标记为完成",
+      wd_reopen_btn: "🔵 改为进行中",
+      wd_edit_link: "编辑"
     },
     en: {
       manage_title: "Manage",
@@ -1199,7 +1234,16 @@ const db = getFirestore(fbApp);
       export_sheet_name: "Work List",
       export_success: (startDate, endDate, count) => `✅ Exported ${count} item(s) for ${startDate} ~ ${endDate}`,
       export_error: "⚠ An error occurred while exporting.",
-      bulk_delete_confirm: (count) => `Delete ${count} selected work item(s)?\nThis cannot be undone.`
+      bulk_delete_confirm: (count) => `Delete ${count} selected work item(s)?\nThis cannot be undone.`,
+      wd_location: "Location",
+      wd_company: "Company / Team",
+      wd_supervisor: "Safety officer",
+      wd_people: "Workers",
+      wd_time: "Time",
+      wd_note: "Note",
+      wd_complete_btn: "✅ Mark as complete",
+      wd_reopen_btn: "🔵 Reopen (in progress)",
+      wd_edit_link: "Edit"
     }
   };
 
@@ -2094,7 +2138,7 @@ const db = getFirestore(fbApp);
       const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
       const labelText = [m.company, zone ? zone.name : ''].filter(Boolean).join(' · ');
       pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || t('work_fallback'))}</div>`;
-      pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkModal(m.id); });
+      pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkDetail(m.id); });
       mapCanvas.appendChild(pin);
     }
 
@@ -2177,7 +2221,7 @@ const db = getFirestore(fbApp);
           <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${statusLabelKo(m.status)}</span></span><span class="time">${m.time||''}</span></div>
           <h4>${escapeHTML(m.workType||t('worktype_empty'))}</h4>
           <div class="meta"><span>👷 ${m.people}${t('unit_people')}</span>${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}</div>`;
-        card.addEventListener('click', ()=>{ zoneDetailBackdrop.classList.remove('show'); openWorkModal(m.id); });
+        card.addEventListener('click', ()=>{ zoneDetailBackdrop.classList.remove('show'); openWorkDetail(m.id); });
         list.appendChild(card);
       });
     }
@@ -2188,6 +2232,75 @@ const db = getFirestore(fbApp);
   $('zone-detail-add').addEventListener('click', ()=>{
     zoneDetailBackdrop.classList.remove('show');
     openWorkModal(null, currentDetailZoneId);
+  });
+
+  // ---------------- work detail (view) modal ----------------
+  // 대시보드에서 작업을 클릭하면 바로 수정 화면으로 가지 않고, 이 읽기전용 상세 팝업이 먼저 뜬다.
+  // 여기서 "작업완료 처리" 버튼으로 상태만 바로 바꿀 수 있고, 실제 수정은 관리자만 별도 링크로 들어간다.
+  const workDetailBackdrop = $('work-detail-backdrop');
+  let workDetailId = null;
+
+  function wdRow(label, value){
+    if(!value) return '';
+    return `<div style="display:flex; justify-content:space-between; gap:12px; font-size:14.5px;"><span style="color:var(--text-dim); font-weight:600;">${escapeHTML(label)}</span><span style="font-weight:700; color:var(--text); text-align:right;">${value}</span></div>`;
+  }
+
+  function openWorkDetail(id){
+    const m = markers.find(x=>x.id===id);
+    if(!m) return;
+    workDetailId = id;
+    const zone = zones.find(z=>z.id===m.zoneId);
+
+    const riskBadge = $('wd-risk-badge');
+    riskBadge.className = 'badge ' + m.risk;
+    riskBadge.textContent = riskLabel(m.risk);
+    const statusBadge = $('wd-status-badge');
+    statusBadge.className = 'badge ' + (m.status === 'done' ? 'done' : 'inprogress');
+    statusBadge.textContent = statusLabelKo(m.status);
+
+    $('wd-title').textContent = m.workType || t('worktype_empty');
+
+    const companyHtml = m.company
+      ? `<span style="display:inline-flex; align-items:center; gap:5px;"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${companyColor(m.company)};"></i>${escapeHTML(m.company)}</span>`
+      : '';
+    $('wd-rows').innerHTML = [
+      wdRow(t('wd_location'), zone ? escapeHTML(zone.name) : ''),
+      wdRow(t('wd_company'), companyHtml),
+      wdRow(t('wd_supervisor'), m.supervisor ? escapeHTML(m.supervisor) : ''),
+      wdRow(t('wd_people'), (m.people || m.people === 0) ? `${m.people}${t('unit_people')}` : ''),
+      wdRow(t('wd_time'), m.time ? escapeHTML(m.time) : ''),
+      wdRow(t('wd_note'), m.note ? escapeHTML(m.note) : '')
+    ].filter(Boolean).join('');
+
+    const completeBtn = $('wd-complete-btn');
+    if(m.status === 'done'){
+      completeBtn.textContent = t('wd_reopen_btn');
+      completeBtn.classList.remove('primary');
+    } else {
+      completeBtn.textContent = t('wd_complete_btn');
+      completeBtn.classList.add('primary');
+    }
+
+    workDetailBackdrop.classList.add('show');
+  }
+  $('work-detail-close').addEventListener('click', ()=>workDetailBackdrop.classList.remove('show'));
+  workDetailBackdrop.addEventListener('click', (e)=>{ if(e.target===workDetailBackdrop) workDetailBackdrop.classList.remove('show'); });
+  $('wd-complete-btn').addEventListener('click', async ()=>{
+    if(!workDetailId) return;
+    const m = markers.find(x=>x.id===workDetailId);
+    if(!m) return;
+    const newStatus = m.status === 'done' ? 'in_progress' : 'done';
+    try{
+      await updateDoc(doc(db,'works',workDetailId), { status: newStatus });
+      workDetailBackdrop.classList.remove('show');
+    }catch(e){
+      console.error('status toggle failed', e);
+    }
+  });
+  $('wd-edit-link').addEventListener('click', ()=>{
+    if(!workDetailId) return;
+    workDetailBackdrop.classList.remove('show');
+    openWorkModal(workDetailId);
   });
 
   // ---------------- sidebar ----------------
@@ -2215,7 +2328,7 @@ const db = getFirestore(fbApp);
           ${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}
           ${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}
         </div>`;
-      card.addEventListener('click', ()=>openWorkModal(m.id));
+      card.addEventListener('click', ()=>openWorkDetail(m.id));
       list.appendChild(card);
     });
   }
@@ -2244,7 +2357,7 @@ const db = getFirestore(fbApp);
           ${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}
           ${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}
         </div>`;
-      card.addEventListener('click', ()=>openWorkModal(m.id));
+      card.addEventListener('click', ()=>openWorkDetail(m.id));
       list.appendChild(card);
     });
   }
