@@ -272,6 +272,9 @@
   .risk-choice button[data-risk="low"].on{ background:var(--low-bg); border-color:var(--low); color:var(--low); }
   .field-row{ display:flex; gap:10px; }
   .field-row .field{ flex:1; }
+  .export-row{ display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .export-label{ font-size:14px; font-weight:700; color:var(--text-dim); margin-right:2px; }
+  .export-btn{ flex:1; justify-content:center; padding:9px 8px; font-size:14px; min-width:64px; }
   .modal-actions{ display:flex; gap:8px; margin-top:18px; }
   .modal-actions .btn{ flex:1; justify-content:center; }
   .modal-close-x{ position:absolute; top:16px; right:16px; width:34px; height:34px; padding:0; justify-content:center; font-size:16px; }
@@ -562,6 +565,14 @@
         <h2>작업현황</h2>
       </div>
 
+      <div class="export-row">
+        <span class="export-label">📥 엑셀 내보내기</span>
+        <button class="btn export-btn" id="export-daily-btn" type="button">일간</button>
+        <button class="btn export-btn" id="export-weekly-btn" type="button">주간</button>
+        <button class="btn export-btn" id="export-monthly-btn" type="button">월간</button>
+      </div>
+      <div class="hint-text" id="export-status-text" style="display:none;"></div>
+
       <div class="field">
         <input type="text" id="status-search" placeholder="작업명 · 업체명 · 위치 · 담당자 검색">
       </div>
@@ -706,7 +717,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
   getFirestore, doc, getDoc, setDoc, onSnapshot,
-  collection, addDoc, updateDoc, deleteDoc, query, where
+  collection, addDoc, updateDoc, deleteDoc, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1509,10 +1520,16 @@ const db = getFirestore(fbApp);
       const companies = [...new Set(worksHere.map(m=>m.company).filter(Boolean))];
       const pinColor = companies.length === 1 ? companyColor(companies[0]) : (companies.length === 0 ? '#9CA3AF' : '#1A1D23');
 
+      // 작업범위(빨간 영역)가 그려진 작업이 있으면, 핀을 위치 등록 지점이 아니라
+      // 그 작업범위의 정중앙에 표시한다.
+      const areaWork = worksHere.find(m => m.area);
+      const pinX = areaWork ? (areaWork.area.x1 + areaWork.area.x2) / 2 : zone.xPct;
+      const pinY = areaWork ? (areaWork.area.y1 + areaWork.area.y2) / 2 : zone.yPct;
+
       const pin = document.createElement('div');
       pin.className = 'pin' + (highCount > 0 ? ' has-warn' : '');
-      pin.style.left = zone.xPct + '%';
-      pin.style.top = zone.yPct + '%';
+      pin.style.left = pinX + '%';
+      pin.style.top = pinY + '%';
       const labelExtra = worksHere.length > 1 ? ` 외 ${worksHere.length-1}건` : '';
       const warnBadge = highCount > 0 ? `<div class="pin-warn">⚠${highCount}</div>` : '';
       pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${totalPeople}</div>${warnBadge}<div class="pin-label">${escapeHTML(zone.name)}${labelExtra}</div>`;
@@ -1797,6 +1814,95 @@ const db = getFirestore(fbApp);
       list.appendChild(groupEl);
     });
   }
+
+  // ---------------- excel export (일간/주간/월간) ----------------
+  function statusLabelKo(s){ return s === 'done' ? '완료' : '진행중'; }
+
+  async function fetchWorksInRange(startDate, endDate){
+    const q = query(collection(db, 'works'), where('date', '>=', startDate), where('date', '<=', endDate));
+    const snap = await getDocs(q);
+    const rows = [];
+    snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+    return rows;
+  }
+
+  function buildExportRows(works){
+    return works
+      .slice()
+      .sort((a,b)=> (a.date||'').localeCompare(b.date||'') || riskRank(a.risk)-riskRank(b.risk))
+      .map(m=>{
+        const zone = zones.find(z=>z.id===m.zoneId);
+        return {
+          '날짜': m.date || '',
+          '위치': zone ? zone.name : '',
+          '작업 내용': m.workType || '',
+          '위험도': riskLabel(m.risk),
+          '인원': m.people || 0,
+          '시간': m.time || '',
+          '업체': m.company || '',
+          '감시단/안전담당자': m.supervisor || '',
+          '상태': statusLabelKo(m.status),
+          '메모': m.note || ''
+        };
+      });
+  }
+
+  async function exportWorksExcel(rangeType){
+    const statusEl = $('export-status-text');
+    statusEl.style.display = 'block';
+    statusEl.style.color = '';
+    statusEl.textContent = '⏳ 데이터를 불러오는 중...';
+    try{
+      const base = new Date(currentDate);
+      let startDate, endDate, fileTag;
+
+      if(rangeType === 'daily'){
+        startDate = endDate = currentDate;
+        fileTag = currentDate;
+      } else if(rangeType === 'weekly'){
+        const day = base.getDay(); // 0=Sun..6=Sat
+        const mondayOffset = day === 0 ? -6 : 1 - day;
+        const monday = new Date(base); monday.setDate(base.getDate() + mondayOffset);
+        const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+        startDate = toISO(monday); endDate = toISO(sunday);
+        fileTag = `${startDate}_~_${endDate}`;
+      } else { // monthly
+        const first = new Date(base.getFullYear(), base.getMonth(), 1);
+        const last = new Date(base.getFullYear(), base.getMonth()+1, 0);
+        startDate = toISO(first); endDate = toISO(last);
+        fileTag = `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}`;
+      }
+
+      const works = await fetchWorksInRange(startDate, endDate);
+      if(works.length === 0){
+        statusEl.style.color = 'var(--high)';
+        statusEl.textContent = `⚠ ${startDate} ~ ${endDate} 기간에 등록된 작업이 없습니다.`;
+        return;
+      }
+
+      const rows = buildExportRows(works);
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws['!cols'] = [
+        {wch:11},{wch:14},{wch:24},{wch:8},{wch:6},{wch:13},{wch:16},{wch:18},{wch:8},{wch:30}
+      ];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '작업목록');
+
+      const siteLabel = (siteNameFromRemote || 'SafetyTop').replace(/[\\/:*?"<>|]/g, '');
+      XLSX.writeFile(wb, `${siteLabel}_작업현황_${fileTag}.xlsx`);
+
+      statusEl.style.color = 'var(--ok, #16a34a)';
+      statusEl.textContent = `✅ ${startDate} ~ ${endDate} 기간 ${works.length}건 내보내기 완료`;
+    }catch(err){
+      console.error('excel export failed', err);
+      statusEl.style.color = 'var(--high)';
+      statusEl.textContent = '⚠ 내보내기 중 오류가 발생했습니다.';
+    }
+  }
+
+  $('export-daily-btn').addEventListener('click', ()=> exportWorksExcel('daily'));
+  $('export-weekly-btn').addEventListener('click', ()=> exportWorksExcel('weekly'));
+  $('export-monthly-btn').addEventListener('click', ()=> exportWorksExcel('monthly'));
 
   // ---------------- bulk complete (admin only) ----------------
   let bulkSelectMode = false;
