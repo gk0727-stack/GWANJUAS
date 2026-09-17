@@ -35,6 +35,21 @@
     --shadow-md: 0 4px 16px rgba(16,24,40,0.08);
   }
 
+  /* ---------- Loading overlay ---------- */
+  .app-loading-overlay{
+    position:fixed; inset:0; z-index:9999; background:var(--bg);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    transition:opacity .25s ease;
+  }
+  .app-loading-overlay.hide{ opacity:0; pointer-events:none; }
+  .app-spinner{
+    width:38px; height:38px; border-radius:50%;
+    border:4px solid var(--border); border-top-color:var(--accent);
+    animation:app-spin 0.8s linear infinite;
+  }
+  .app-loading-text{ font-size:14px; font-weight:600; color:var(--text-dim); }
+  @keyframes app-spin{ to{ transform:rotate(360deg); } }
+
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{
     background:var(--bg);
@@ -456,6 +471,11 @@
 </head>
 <body>
 
+<div class="app-loading-overlay" id="app-loading-overlay">
+  <div class="app-spinner"></div>
+  <div class="app-loading-text" id="app-loading-text" data-i18n="app_loading_text">불러오는 중...</div>
+</div>
+
 <div class="app">
 
   <div class="dashboard-viewport">
@@ -554,7 +574,8 @@
 
       <div class="field">
         <label><span data-i18n="label_worktype">작업 내용</span> <span class="req-mark">*</span></label>
-        <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치" data-i18n-placeholder="worktype_ph">
+        <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치" data-i18n-placeholder="worktype_ph" list="worktype-datalist" autocomplete="off">
+        <datalist id="worktype-datalist"></datalist>
       </div>
 
       <div class="field">
@@ -585,7 +606,7 @@
         <div class="field"><label data-i18n="label_time_end">종료 시간</label><input type="time" id="f-time-end"></div>
       </div>
 
-      <div class="field"><label data-i18n="label_company">업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀" data-i18n-placeholder="company_ph"></div>
+      <div class="field"><label data-i18n="label_company">업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀" data-i18n-placeholder="company_ph" list="company-datalist" autocomplete="off"><datalist id="company-datalist"></datalist></div>
       <div class="field">
         <label data-i18n="label_supervisor">감시단 / 안전담당자</label>
         <div class="staff-check-list" id="f-supervisor-checks"></div>
@@ -759,7 +780,7 @@
         <option value="안전보건총괄책임자" data-i18n="role_safety_chief">안전보건총괄책임자</option>
       </select>
     </div>
-    <div class="hint-text" id="sn-error" style="display:none; color:var(--high);" data-i18n="staff_save_error">저장 실패. 관리자 콘솔에서 Firestore 규칙을 확인해주세요.</div>
+    <div class="hint-text" id="sn-error" style="display:none; color:var(--high);" data-i18n="staff_save_error">저장에 실패하였습니다. 잠시 후 다시 시도해주세요.</div>
     <div class="modal-actions">
       <button class="btn primary" id="sn-save" style="width:100%;" data-i18n="save_btn">저장</button>
     </div>
@@ -921,7 +942,7 @@ const db = getFirestore(fbApp);
       role_safety_watch: "안전감시단",
       role_safety_chief: "안전보건총괄책임자",
       role_other: "기타",
-      staff_save_error: "저장 실패. 관리자 콘솔에서 Firestore 규칙을 확인해주세요.",
+      staff_save_error: "저장에 실패하였습니다. 잠시 후 다시 시도해주세요.",
       manage_panel_title: "🔧 관리자 패널",
       mp_upload_map: "🛰️  지도 업로드 / 교체",
       mp_manage_zones: "📍  위치(구역) 관리",
@@ -981,7 +1002,8 @@ const db = getFirestore(fbApp);
       wd_complete_btn: "✅ 작업완료 처리",
       wd_reopen_btn: "🔵 진행중으로 변경",
       wd_edit_link: "수정하기",
-      wd_map_label: "지도 위 작업범위"
+      wd_map_label: "지도 위 작업범위",
+      app_loading_text: "불러오는 중..."
     },
     zh: {
       manage_title: "管理",
@@ -1062,7 +1084,7 @@ const db = getFirestore(fbApp);
       role_safety_watch: "安全监视团",
       role_safety_chief: "安全保健总责人",
       role_other: "其他",
-      staff_save_error: "保存失败。请在管理控制台确认Firestore规则。",
+      staff_save_error: "保存失败，请稍后重试。",
       manage_panel_title: "🔧 管理员面板",
       mp_upload_map: "🛰️  上传/更换地图",
       mp_manage_zones: "📍  位置（区域）管理",
@@ -1122,7 +1144,8 @@ const db = getFirestore(fbApp);
       wd_complete_btn: "✅ 标记为完成",
       wd_reopen_btn: "🔵 改为进行中",
       wd_edit_link: "编辑",
-      wd_map_label: "地图上的作业范围"
+      wd_map_label: "地图上的作业范围",
+      app_loading_text: "正在加载..."
     },
     en: {
       manage_title: "Manage",
@@ -1203,7 +1226,7 @@ const db = getFirestore(fbApp);
       role_safety_watch: "Safety watch",
       role_safety_chief: "Chief safety officer",
       role_other: "Other",
-      staff_save_error: "Save failed. Please check Firestore rules in the admin console.",
+      staff_save_error: "Save failed. Please try again in a moment.",
       manage_panel_title: "🔧 Admin panel",
       mp_upload_map: "🛰️  Upload / replace map",
       mp_manage_zones: "📍  Manage locations",
@@ -1263,7 +1286,8 @@ const db = getFirestore(fbApp);
       wd_complete_btn: "✅ Mark as complete",
       wd_reopen_btn: "🔵 Reopen (in progress)",
       wd_edit_link: "Edit",
-      wd_map_label: "Work area on map"
+      wd_map_label: "Work area on map",
+      app_loading_text: "Loading..."
     }
   };
 
@@ -1530,6 +1554,52 @@ const db = getFirestore(fbApp);
     });
   }
 
+  // ---------------- recent-value suggestions (작업내용/업체명 자동완성) ----------------
+  // 브라우저(이 기기)에 최근 입력했던 값을 기억해뒀다가 드롭다운으로 추천해서 반복입력을 줄여준다.
+  function getRecentList(storageKey){
+    try{
+      const raw = localStorage.getItem(storageKey);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    }catch(e){ return []; }
+  }
+  function pushRecentValue(storageKey, value){
+    if(!value) return;
+    try{
+      let list = getRecentList(storageKey).filter(v=>v !== value);
+      list.unshift(value);
+      if(list.length > 20) list = list.slice(0, 20);
+      localStorage.setItem(storageKey, JSON.stringify(list));
+    }catch(e){ /* localStorage 사용 불가 시 무시 */ }
+  }
+  function populateDatalist(datalistId, storageKey){
+    const dl = $(datalistId);
+    if(!dl) return;
+    dl.innerHTML = '';
+    getRecentList(storageKey).forEach(v=>{
+      const opt = document.createElement('option');
+      opt.value = v;
+      dl.appendChild(opt);
+    });
+  }
+  function refreshRecentSuggestions(){
+    populateDatalist('worktype-datalist', 'safetytop_recent_worktypes');
+    populateDatalist('company-datalist', 'safetytop_recent_companies');
+  }
+
+  // ---------------- initial loading overlay ----------------
+  let appLoadingHidden = false;
+  function hideAppLoadingOverlay(){
+    if(appLoadingHidden) return;
+    appLoadingHidden = true;
+    const overlay = $('app-loading-overlay');
+    if(!overlay) return;
+    overlay.classList.add('hide');
+    setTimeout(()=>{ overlay.style.display = 'none'; }, 300);
+  }
+  // 혹시 네트워크 문제 등으로 데이터가 안 오더라도 화면이 계속 로딩중으로 막혀있지 않도록 안전장치
+  setTimeout(hideAppLoadingOverlay, 6000);
+
   function subscribeWorks(date){
     if(unsubWorks) unsubWorks();
     const q = query(collection(db, 'works'), where('date', '==', date));
@@ -1539,7 +1609,8 @@ const db = getFirestore(fbApp);
       renderSidebar();
       renderFullWorkList();
       renderStats();
-    }, (err)=>{ console.error('works listen error', err); });
+      hideAppLoadingOverlay();
+    }, (err)=>{ console.error('works listen error', err); hideAppLoadingOverlay(); });
   }
 
   // ---------------- site name ----------------
@@ -1620,11 +1691,11 @@ const db = getFirestore(fbApp);
           const errText = (err && err.message) || '';
           let msg;
           if(errText === 'TIMEOUT'){
-            msg = '⏱️ 시간 초과 — 인터넷 연결을 확인하거나, 이 화면이 Claude 미리보기라면 실제 브라우저에서 열어 다시 시도해주세요. (Firestore 콘솔에서 meta/mapImage 필드의 색인 면제 설정도 확인해보세요)';
+            msg = '⏱️ 시간이 너무 오래 걸려 실패했습니다. 인터넷 연결을 확인하고 다시 시도해주세요.';
           } else if(errText.includes('1500 bytes') || errText.includes('INVALID_ARGUMENT')){
-            msg = '❌ Firestore 설정 문제: mapImage 필드가 색인 대상이라 1,500바이트 제한에 걸렸습니다. Firebase 콘솔 → Firestore → 색인 → 단일 필드에서 meta/mapImage 필드를 색인 면제로 등록해주세요.';
+            msg = '❌ 이미지 저장에 실패했습니다. 사진을 더 압축하거나 낮은 해상도로 다시 캡처해서 시도해주세요.';
           } else {
-            msg = '❌ 저장 실패: ' + (errText || '알 수 없는 오류') + ' — 관리자 콘솔에서 Firestore 규칙을 확인해주세요.';
+            msg = '❌ 저장에 실패했습니다. 잠시 후 다시 시도해주세요.';
           }
           showUploadStatus(msg, true);
           mapImageURL = previousImage;
@@ -1987,7 +2058,7 @@ const db = getFirestore(fbApp);
       staffEditId = null;
     }catch(e){
       console.error('staff save failed', e);
-      $('sn-error').textContent = t('save_failed_prefix') + (e && e.message ? e.message : t('unknown_error'));
+      $('sn-error').textContent = t('staff_save_error');
       $('sn-error').style.display = 'block';
     }
   });
@@ -2465,6 +2536,7 @@ const db = getFirestore(fbApp);
     editingId = duplicateFrom ? null : id;
     const m = duplicateFrom ? markers.find(x=>x.id===duplicateFrom) : (id ? markers.find(x=>x.id===id) : null);
     $('modal-title').textContent = duplicateFrom ? '위험작업 등록 (복사됨)' : (m ? '위험작업 수정' : '위험작업 등록');
+    refreshRecentSuggestions();
     populateZoneSelect(m ? m.zoneId : presetZoneId);
     $('f-worktype').value = m ? m.workType : '';
     $('f-people').value = m ? m.people : '';
@@ -2819,6 +2891,8 @@ const db = getFirestore(fbApp);
           date: currentDate, zoneId, workType, people, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk, createdAt: Date.now()
         });
       }
+      pushRecentValue('safetytop_recent_worktypes', workType);
+      pushRecentValue('safetytop_recent_companies', company);
       closeWorkModal();
     }catch(e){
       console.error('work save failed', e);
