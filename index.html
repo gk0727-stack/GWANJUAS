@@ -166,19 +166,19 @@
   .legend .dot{ width:11px; height:11px; border-radius:50%; display:inline-block; flex-shrink:0; }
 
   /* ---------- Pins ---------- */
-  .pin{ position:absolute; transform:translate(-50%,-50%); z-index:10; cursor:pointer; }
+  .pin{ position:absolute; transform:translate(-50%,-50%); z-index:10; cursor:pointer; --pin-size:56px; }
   .pin-circle{
-    width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:19px; font-weight:800; color:#fff; border:3.5px solid #fff;
+    width:var(--pin-size,56px); height:var(--pin-size,56px); border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:calc(var(--pin-size,56px) * 0.34); font-weight:800; color:#fff; border:calc(var(--pin-size,56px) * 0.0625) solid #fff;
     box-shadow:0 3px 10px rgba(16,24,40,0.35);
   }
   .pin.has-warn::before{
-    content:""; position:absolute; inset:-8px; border-radius:50%; border:3px solid var(--high);
+    content:""; position:absolute; inset:calc(var(--pin-size,56px) * -0.14); border-radius:50%; border:3px solid var(--high);
     animation:pulse 1.8s ease-out infinite;
   }
   @keyframes pulse{ 0%{ transform:scale(0.85); opacity:0.9; } 100%{ transform:scale(1.6); opacity:0; } }
   .pin-label{
-    position:absolute; top:60px; left:50%; transform:translateX(-50%);
+    position:absolute; top:calc(var(--pin-size,56px) + 4px); left:50%; transform:translateX(-50%);
     background:var(--text); border:1px solid var(--text); padding:4px 10px;
     border-radius:6px; font-size:14px; font-weight:600; white-space:nowrap; color:#fff;
     pointer-events:none; opacity:0; transition:opacity .12s;
@@ -404,8 +404,8 @@
 
   /* ---------- Pin risk badge (company-colored pins) ---------- */
   .pin-warn{
-    position:absolute; top:-8px; right:-10px; background:var(--high); color:#fff;
-    font-size:12.5px; font-weight:800; min-width:24px; height:24px; border-radius:12px;
+    position:absolute; top:calc(var(--pin-size,56px) * -0.14); right:calc(var(--pin-size,56px) * -0.18); background:var(--high); color:#fff;
+    font-size:calc(var(--pin-size,56px) * 0.22); font-weight:800; min-width:calc(var(--pin-size,56px) * 0.43); height:calc(var(--pin-size,56px) * 0.43); border-radius:50%;
     display:flex; align-items:center; justify-content:center; padding:0 5px;
     border:2.5px solid #fff; box-shadow:0 1px 3px rgba(16,24,40,0.3);
   }
@@ -1433,6 +1433,13 @@ const db = getFirestore(fbApp);
     }, (err)=>{ console.error('staff listen error', err); });
 
     subscribeWorks(currentDate);
+
+    // 화면 크기(회전 등)가 바뀌면 핀 크기를 다시 계산
+    let resizeTimer = null;
+    window.addEventListener('resize', ()=>{
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(()=>{ renderAllPins(); }, 150);
+    });
   }
 
   function subscribeWorks(date){
@@ -1997,6 +2004,12 @@ const db = getFirestore(fbApp);
       });
     })();
 
+    // 핀 크기: 화면(지도) 크기 대비 그려진 작업범위(빨간 영역) 비율에 맞춰 축소.
+    // 범위가 없는 핀은 지도 폭 기준으로만 축소(모바일에서 너무 크게 보이지 않도록).
+    const canvasRectForPins = mapCanvas.getBoundingClientRect();
+    const canvasWpx = canvasRectForPins.width || mapCanvas.offsetWidth || 1;
+    const canvasHpx = canvasRectForPins.height || mapCanvas.offsetHeight || 1;
+
     markers.forEach(m=>{
       const zone = zones.find(z=>z.id===m.zoneId);
       let pinX, pinY;
@@ -2022,6 +2035,16 @@ const db = getFirestore(fbApp);
       pin.className = 'pin' + (m.risk === 'high' ? ' has-warn' : '');
       pin.style.left = pinX + '%';
       pin.style.top = pinY + '%';
+      let pinSizePx;
+      if(m.area){
+        const areaWpx = ((m.area.x2 - m.area.x1) / 100) * canvasWpx;
+        const areaHpx = ((m.area.y2 - m.area.y1) / 100) * canvasHpx;
+        const minSide = Math.max(0, Math.min(areaWpx, areaHpx));
+        pinSizePx = Math.max(26, Math.min(56, minSide * 0.6));
+      } else {
+        pinSizePx = Math.max(30, Math.min(56, canvasWpx * 0.045));
+      }
+      pin.style.setProperty('--pin-size', pinSizePx.toFixed(1) + 'px');
       const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
       const labelText = [m.company, zone ? zone.name : ''].filter(Boolean).join(' · ');
       pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || t('work_fallback'))}</div>`;
