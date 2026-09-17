@@ -278,6 +278,7 @@
   .loc-row{ display:flex; gap:8px; }
   .loc-row select{ flex:1; }
   .hint-text{ font-size:14px; color:var(--text-dim); margin-top:7px; line-height:1.6; }
+  .req-mark{ color:var(--high); font-weight:700; }
 
   /* zone manage list */
   .zone-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:240px; overflow-y:auto; }
@@ -496,7 +497,7 @@
       </div>
 
       <div class="field">
-        <label>위치</label>
+        <label>위치 <span class="req-mark">*</span></label>
         <div class="loc-row">
           <select id="f-zone"></select>
           <button class="btn" id="new-zone-from-work" type="button">＋ 새 위치</button>
@@ -505,12 +506,12 @@
       </div>
 
       <div class="field">
-        <label>작업 내용</label>
+        <label>작업 내용 <span class="req-mark">*</span></label>
         <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치">
       </div>
 
       <div class="field">
-        <label>위험도</label>
+        <label>위험도 <span class="req-mark">*</span></label>
         <div class="risk-choice">
           <button data-risk="high" type="button">고위험</button>
           <button data-risk="mid" type="button">중위험</button>
@@ -544,6 +545,8 @@
         <div class="hint-text" id="staff-hint" style="display:none;">등록된 담당자가 없습니다. 관리 탭 → 담당자 관리에서 먼저 등록해주세요.</div>
       </div>
       <div class="field"><label>메모 (안전조치 등)</label><textarea id="f-note" placeholder="예: 안전대 체결 확인, 신호수 배치"></textarea></div>
+
+      <div class="hint-text" id="work-form-error" style="display:none; color:var(--high); font-weight:700;"></div>
 
       <div class="modal-actions">
         <button class="btn danger" id="delete-btn" style="display:none;">삭제</button>
@@ -600,7 +603,7 @@
 
   <div class="bottom-tabbar">
     <button class="tab-btn active" id="tab-dashboard">
-      <span class="tab-icon">🗺️</span><span>대시보드</span>
+      <span class="tab-icon">🏗️</span><span>대시보드</span>
     </button>
     <button class="tab-btn" id="tab-add-work">
       <span class="tab-icon">✏️</span><span>작업등록</span>
@@ -1640,6 +1643,7 @@ const db = getFirestore(fbApp);
     pendingArea = (m && m.area) ? m.area : null;
     updateAreaStatusText();
     $('delete-btn').style.display = m ? 'block' : 'none';
+    $('work-form-error').style.display = 'none';
     showWorkPage();
     setActiveTab('add-work');
   }
@@ -1805,8 +1809,21 @@ const db = getFirestore(fbApp);
     const area = pendingArea || null;
     const status = workStatus;
 
-    if(!zoneId){ return; }
-    if(!workType){ $('f-worktype').focus(); return; }
+    const errEl = $('work-form-error');
+    if(!zoneId){
+      errEl.textContent = '⚠ 위치를 먼저 선택(또는 새로 등록)해주세요.';
+      errEl.style.display = 'block';
+      errEl.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    if(!workType){
+      errEl.textContent = '⚠ 작업 내용을 입력해주세요.';
+      errEl.style.display = 'block';
+      $('f-worktype').focus();
+      $('f-worktype').scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    errEl.style.display = 'none';
 
     try{
       if(editingId){
