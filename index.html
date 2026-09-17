@@ -1519,13 +1519,43 @@ const db = getFirestore(fbApp);
       mapCanvas.appendChild(rect);
     });
 
-    // 작업범위(빨간 영역)를 직접 그린 작업은, 업체(색깔)별로 각자 자기 범위 위에
-    // 개별 핀으로 표시한다 (다른 업체 인원과 합쳐지지 않도록).
-    const worksWithArea = markers.filter(m => m.area);
-    worksWithArea.forEach(m=>{
+    // 모든 작업은 절대 합산하지 않고, 업체(색깔)별로 각자 개별 핀으로 표시한다.
+    // - 작업범위(빨간 영역)를 그렸으면 그 범위의 정중앙
+    // - 안 그렸으면 등록된 위치(구역) 지점 (단, 같은 위치를 공유하는 작업이 여럿이면
+    //   완전히 겹치지 않도록 살짝 부채꼴로 펼쳐서 배치한다)
+    const noAreaGroupIndex = new Map(); // workId -> {idx, total}
+    (function(){
+      const byZone = new Map();
+      markers.forEach(m=>{
+        if(m.area || !m.zoneId) return;
+        if(!byZone.has(m.zoneId)) byZone.set(m.zoneId, []);
+        byZone.get(m.zoneId).push(m);
+      });
+      byZone.forEach(list=>{
+        list.forEach((m,idx)=> noAreaGroupIndex.set(m.id, { idx, total: list.length }));
+      });
+    })();
+
+    markers.forEach(m=>{
       const zone = zones.find(z=>z.id===m.zoneId);
-      const pinX = (m.area.x1 + m.area.x2) / 2;
-      const pinY = (m.area.y1 + m.area.y2) / 2;
+      let pinX, pinY;
+      if(m.area){
+        pinX = (m.area.x1 + m.area.x2) / 2;
+        pinY = (m.area.y1 + m.area.y2) / 2;
+      } else if(zone){
+        const g = noAreaGroupIndex.get(m.id);
+        if(g && g.total > 1){
+          const angle = (g.idx * 137.5) * Math.PI / 180; // 골든 앵글로 겹치지 않게 분산
+          const radius = 3 + g.idx * 1.4;
+          pinX = zone.xPct + radius * Math.cos(angle);
+          pinY = zone.yPct + radius * Math.sin(angle);
+        } else {
+          pinX = zone.xPct;
+          pinY = zone.yPct;
+        }
+      } else {
+        return; // 위치 정보가 전혀 없는 작업(예: 위치 미지정으로 등록됨)은 지도에 표시하지 않음
+      }
       const pinColor = companyColor(m.company);
       const pin = document.createElement('div');
       pin.className = 'pin' + (m.risk === 'high' ? ' has-warn' : '');
@@ -1533,42 +1563,22 @@ const db = getFirestore(fbApp);
       pin.style.top = pinY + '%';
       const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
       const labelText = [m.company, zone ? zone.name : ''].filter(Boolean).join(' · ');
-      pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || '작업')}</div>`;
+      pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || '작업')}</div>`;
       pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkModal(m.id); });
       mapCanvas.appendChild(pin);
     });
 
-    // 작업범위를 그리지 않은 작업들은 기존처럼 위치(구역) 단위로 합쳐서 표시한다.
+    // 오늘 등록된 작업이 하나도 없는 위치(구역)만 회색 점으로 표시
     zones.forEach(zone=>{
-      const allWorksHere = markers.filter(m=>m.zoneId === zone.id);
-      if(allWorksHere.length === 0){
-        const dot = document.createElement('div');
-        dot.className = 'zone-dot';
-        dot.style.left = zone.xPct + '%';
-        dot.style.top = zone.yPct + '%';
-        dot.innerHTML = `<div class="pin-label">${escapeHTML(zone.name)}</div>`;
-        dot.addEventListener('click', (ev)=>{ ev.stopPropagation(); openZoneDetail(zone.id); });
-        mapCanvas.appendChild(dot);
-        return;
-      }
-
-      const worksHere = allWorksHere.filter(m => !m.area);
-      if(worksHere.length === 0) return; // 이 위치의 작업은 전부 위에서 개별 범위 핀으로 이미 표시됨
-
-      const totalPeople = worksHere.reduce((s,m)=>s+(Number(m.people)||0),0);
-      const highCount = worksHere.filter(m=>m.risk==='high').length;
-      const companies = [...new Set(worksHere.map(m=>m.company).filter(Boolean))];
-      const pinColor = companies.length === 1 ? companyColor(companies[0]) : (companies.length === 0 ? '#9CA3AF' : '#1A1D23');
-
-      const pin = document.createElement('div');
-      pin.className = 'pin' + (highCount > 0 ? ' has-warn' : '');
-      pin.style.left = zone.xPct + '%';
-      pin.style.top = zone.yPct + '%';
-      const labelExtra = worksHere.length > 1 ? ` 외 ${worksHere.length-1}건` : '';
-      const warnBadge = highCount > 0 ? `<div class="pin-warn">⚠${highCount}</div>` : '';
-      pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${totalPeople}</div>${warnBadge}<div class="pin-label">${escapeHTML(zone.name)}${labelExtra}</div>`;
-      pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openZoneDetail(zone.id); });
-      mapCanvas.appendChild(pin);
+      const hasWorkToday = markers.some(m=>m.zoneId === zone.id);
+      if(hasWorkToday) return;
+      const dot = document.createElement('div');
+      dot.className = 'zone-dot';
+      dot.style.left = zone.xPct + '%';
+      dot.style.top = zone.yPct + '%';
+      dot.innerHTML = `<div class="pin-label">${escapeHTML(zone.name)}</div>`;
+      dot.addEventListener('click', (ev)=>{ ev.stopPropagation(); openZoneDetail(zone.id); });
+      mapCanvas.appendChild(dot);
     });
 
     renderLegend();
