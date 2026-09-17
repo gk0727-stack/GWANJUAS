@@ -244,6 +244,8 @@
 
   /* ---------- 작업현황 카드: 제목 우선 레이아웃 (card-v2) ---------- */
   .work-card.card-v2 .v2-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .work-card.card-v2 .v2-top .bulk-checkbox{ width:22px; height:22px; flex-shrink:0; margin-top:1px; accent-color:var(--accent); cursor:pointer; }
+  .work-card.card-v2 .v2-top .v2-title{ flex:1; }
   .work-card.card-v2 .v2-title{ font-size:16.5px; font-weight:700; color:var(--text); line-height:1.35; margin:0; }
   .work-card.card-v2 .v2-risk-row{ margin-bottom:9px; }
   .work-card.card-v2 .v2-meta{ display:flex; flex-direction:column; gap:4px; margin-bottom:4px; }
@@ -1803,8 +1805,10 @@ const db = getFirestore(fbApp);
         const card = document.createElement('div');
         card.className = 'work-card card-v2';
         card.dataset.risk = m.risk;
+        const isChecked = bulkSelectMode && bulkSelectedIds.has(m.id);
         card.innerHTML = `
           <div class="v2-top">
+            ${bulkSelectMode ? `<input type="checkbox" class="bulk-checkbox" ${isChecked?'checked':''}>` : ''}
             <h4 class="v2-title">${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
             <span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span>
           </div>
@@ -1818,11 +1822,21 @@ const db = getFirestore(fbApp);
         if(bulkSelectMode){
           card.classList.add('bulk-mode');
           if(bulkSelectedIds.has(m.id)) card.classList.add('bulk-selected');
-          card.addEventListener('click', ()=>{
+          const toggleSelect = ()=>{
             if(bulkSelectedIds.has(m.id)){ bulkSelectedIds.delete(m.id); card.classList.remove('bulk-selected'); }
             else { bulkSelectedIds.add(m.id); card.classList.add('bulk-selected'); }
+            const cb = card.querySelector('.bulk-checkbox');
+            if(cb) cb.checked = bulkSelectedIds.has(m.id);
             updateBulkBar();
+          };
+          card.addEventListener('click', (ev)=>{
+            if(ev.target.classList.contains('bulk-checkbox')) return; // checkbox has its own handler
+            toggleSelect();
           });
+          const checkboxEl = card.querySelector('.bulk-checkbox');
+          if(checkboxEl){
+            checkboxEl.addEventListener('click', (ev)=>{ ev.stopPropagation(); toggleSelect(); });
+          }
         } else {
           card.addEventListener('click', ()=>openWorkModal(m.id));
         }
