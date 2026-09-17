@@ -883,7 +883,10 @@ const db = getFirestore(fbApp);
       let success = 0, fail = 0;
       for(const r of targetRows){
         const risk = RISK_GRADE_MAP[String(r['위험성등급']).trim()] || 'mid';
-        const workType = String(r['공종'] || '').trim();
+        const rawWorkType = String(r['공종'] || '').trim();
+        // "건축 > 금속 및 잡공 > ... > 코킹 및 정리정돈 작업" 처럼 계층형으로 되어 있으면
+        // 마지막 항목("코킹 및 정리정돈 작업")만 작업 내용으로 사용한다.
+        const workType = rawWorkType.includes('>') ? rawWorkType.split('>').pop().trim() : rawWorkType;
         const company = String(r['기업/협력사'] || '').trim();
         try{
           await addDoc(collection(db,'works'), {
