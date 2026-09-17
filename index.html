@@ -75,6 +75,12 @@
   .weather-widget .w-icon{ font-size:18px; }
   .weather-widget .w-temp{ color:var(--text); font-weight:800; font-size:15px; }
   .weather-widget .w-meta{ font-size:11px; color:var(--text-dim); font-weight:500; }
+  .lang-switch{ display:flex; align-items:center; gap:2px; background:var(--panel-2); border:1px solid var(--border); border-radius:9px; padding:3px; }
+  .lang-switch .lang-btn{
+    background:none; border:none; color:var(--text-muted); font-size:13px; font-weight:700;
+    padding:5px 9px; border-radius:6px; min-width:30px;
+  }
+  .lang-switch .lang-btn.active{ background:var(--accent); color:#fff; }
   .manage-corner-btn{
     background:none; border:none; color:var(--text-dim); font-size:15px;
     width:28px; height:28px; display:flex; align-items:center; justify-content:center;
@@ -251,6 +257,8 @@
   .work-card.card-v2 .v2-meta{ display:flex; flex-direction:column; gap:4px; margin-bottom:4px; }
   .work-card.card-v2 .v2-meta-row{ font-size:14px; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
   .work-card.card-v2 .v2-supervisor{ margin-top:6px; font-size:14px; font-weight:700; color:#D97706; }
+  .work-card.card-v2 .copy-work-btn{ margin-top:10px; width:100%; justify-content:center; padding:8px; font-size:13.5px; font-weight:600; color:var(--accent); border-color:var(--accent-bg); background:var(--accent-bg); }
+  .work-card.card-v2 .copy-work-btn:hover{ filter:brightness(0.97); }
 
   /* ---------- Modal generic ---------- */
   .modal-backdrop{
@@ -433,7 +441,7 @@
   <div class="header">
     <div class="header-left">
       <h1><img src="data:image/png;base64,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" alt="WOOMI CONSTRUCTION" style="height:32px;width:auto;vertical-align:middle;margin-right:8px;"> Safety-Top</h1>
-      <input id="site-name" class="site-name-input" placeholder="현장명 입력" value="">
+      <input id="site-name" class="site-name-input" placeholder="현장명 입력" data-i18n-placeholder="site_name_ph" value="">
     </div>
     <div class="header-right">
       <div class="weather-widget" id="weather-widget" style="display:none;"></div>
@@ -442,7 +450,12 @@
         <input type="date" id="date-picker">
         <button id="next-day">›</button>
       </div>
-      <button id="tab-manage" class="manage-corner-btn" title="관리">⚙️</button>
+      <div class="lang-switch" id="lang-switch">
+        <button type="button" class="lang-btn" data-lang="ko">한</button>
+        <button type="button" class="lang-btn" data-lang="zh">中</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <button id="tab-manage" class="manage-corner-btn" title="관리" data-i18n-title="manage_title">⚙️</button>
       <input type="file" id="file-input" accept="image/*">
     </div>
   </div>
@@ -459,17 +472,17 @@
             <div class="icon">🛰️</div>
             <h3 id="empty-title">위성지도를 업로드하세요</h3>
             <p id="empty-desc">구글맵 또는 네이버맵에서 현장을 위성/항공 뷰로 띄운 뒤 화면을 캡처해서 올려주세요. 이후엔 계속 저장되어 다시 올릴 필요 없어요.</p>
-            <button class="btn primary admin-only" id="empty-upload-btn" style="display:none;">이미지 업로드</button>
+            <button class="btn primary admin-only" id="empty-upload-btn" style="display:none;" data-i18n="empty_upload_btn">이미지 업로드</button>
           </div>
         </div>
 
         <div class="place-hint" id="place-hint" style="align-items:center; gap:10px;">
-          <span id="place-hint-text">지도를 클릭해서 위치를 지정하세요</span>
-          <button id="place-hint-cancel" type="button" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
+          <span id="place-hint-text" data-i18n="place_hint_default">지도를 클릭해서 위치를 지정하세요</span>
+          <button id="place-hint-cancel" type="button" data-i18n="cancel" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
         </div>
         <div class="place-hint" id="area-draw-hint" style="display:none; align-items:center; gap:10px;">
-          <span>지도를 드래그해서 작업범위를 표시하세요</span>
-          <button id="area-draw-cancel" type="button" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
+          <span data-i18n="area_draw_hint">지도를 드래그해서 작업범위를 표시하세요</span>
+          <button id="area-draw-cancel" type="button" data-i18n="cancel" style="background:none;border:none;color:#1D4ED8;font-weight:800;font-size:14.5px;padding:2px 4px;">취소</button>
         </div>
         <div class="upload-status" id="upload-status"></div>
         <div class="map-toolbar" id="map-toolbar" style="display:none;"></div>
@@ -481,22 +494,22 @@
     <div class="sidebar">
       <div class="sidebar-head" style="flex-direction:column; align-items:flex-start; gap:2px;">
         <div style="display:flex; width:100%; align-items:center; justify-content:space-between;">
-          <h2>주요 작업목록</h2>
+          <h2 data-i18n="sidebar_title">주요 작업목록</h2>
           <span class="count" id="sidebar-count">0건</span>
         </div>
-        <span style="font-size:12.5px; color:var(--text-dim); font-weight:500;">고위험 작업만 표시됩니다</span>
+        <span style="font-size:12.5px; color:var(--text-dim); font-weight:500;" data-i18n="sidebar_subtitle">고위험 작업만 표시됩니다</span>
       </div>
       <div class="sidebar-list" id="sidebar-list"></div>
     </div>
   </div>
 
   <div class="stats">
-    <div class="stat-card"><div class="num" id="stat-total-people">0</div><div class="label">총 출역 인원</div></div>
-    <div class="stat-card high"><div class="num" id="stat-high-people">0</div><div class="label">고위험 작업 인원</div></div>
-    <div class="stat-card"><div class="num" id="stat-total-works">0</div><div class="label">전체 작업 건수</div></div>
-    <div class="stat-card high"><div class="num" id="stat-high">0</div><div class="label">고위험 건수</div></div>
-    <div class="stat-card mid"><div class="num" id="stat-mid">0</div><div class="label">중위험 건수</div></div>
-    <div class="stat-card low"><div class="num" id="stat-low">0</div><div class="label">저위험 건수</div></div>
+    <div class="stat-card"><div class="num" id="stat-total-people">0</div><div class="label" data-i18n="stat_total_people">총 출역 인원</div></div>
+    <div class="stat-card high"><div class="num" id="stat-high-people">0</div><div class="label" data-i18n="stat_high_people">고위험 작업 인원</div></div>
+    <div class="stat-card"><div class="num" id="stat-total-works">0</div><div class="label" data-i18n="stat_total_works">전체 작업 건수</div></div>
+    <div class="stat-card high"><div class="num" id="stat-high">0</div><div class="label" data-i18n="stat_high">고위험 건수</div></div>
+    <div class="stat-card mid"><div class="num" id="stat-mid">0</div><div class="label" data-i18n="stat_mid">중위험 건수</div></div>
+    <div class="stat-card low"><div class="num" id="stat-low">0</div><div class="label" data-i18n="stat_low">저위험 건수</div></div>
   </div>
   </div>
 
@@ -504,65 +517,65 @@
   <div class="page-view" id="page-add-work" style="display:none;">
     <div class="page-inner">
       <div class="page-header">
-        <button class="page-back" id="page-back-btn">← 뒤로</button>
-        <h2 id="modal-title">위험작업 등록</h2>
+        <button class="page-back" id="page-back-btn" data-i18n="back">← 뒤로</button>
+        <h2 id="modal-title" data-i18n="work_add_title">위험작업 등록</h2>
       </div>
 
       <div class="field">
-        <label>위치 <span class="req-mark">*</span></label>
+        <label><span data-i18n="label_location">위치</span> <span class="req-mark">*</span></label>
         <div class="loc-row">
           <select id="f-zone"></select>
-          <button class="btn" id="new-zone-from-work" type="button">＋ 새 위치</button>
+          <button class="btn" id="new-zone-from-work" type="button" data-i18n="new_zone_btn">＋ 새 위치</button>
         </div>
-        <div class="hint-text" id="zone-hint" style="display:none;">등록된 위치가 없습니다. "새 위치"로 먼저 만들어주세요.</div>
+        <div class="hint-text" id="zone-hint" style="display:none;" data-i18n="zone_hint">등록된 위치가 없습니다. "새 위치"로 먼저 만들어주세요.</div>
       </div>
 
       <div class="field">
-        <label>작업 내용 <span class="req-mark">*</span></label>
-        <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치">
+        <label><span data-i18n="label_worktype">작업 내용</span> <span class="req-mark">*</span></label>
+        <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치" data-i18n-placeholder="worktype_ph">
       </div>
 
       <div class="field">
-        <label>위험도 <span class="req-mark">*</span></label>
+        <label><span data-i18n="label_risk">위험도</span> <span class="req-mark">*</span></label>
         <div class="risk-choice">
-          <button data-risk="high" type="button">고위험</button>
-          <button data-risk="mid" type="button">중위험</button>
-          <button data-risk="low" type="button">저위험</button>
+          <button data-risk="high" type="button" data-i18n="risk_high">고위험</button>
+          <button data-risk="mid" type="button" data-i18n="risk_mid">중위험</button>
+          <button data-risk="low" type="button" data-i18n="risk_low">저위험</button>
         </div>
       </div>
 
       <div class="field">
-        <label>작업 범위 표시 (선택)</label>
-        <button type="button" class="btn" id="draw-area-btn">🗺️ 지도에서 범위 그리기</button>
+        <label data-i18n="label_area">작업 범위 표시 (선택)</label>
+        <button type="button" class="btn" id="draw-area-btn" data-i18n="draw_area_btn">🗺️ 지도에서 범위 그리기</button>
         <div class="hint-text" id="area-status-text" style="display:none;"></div>
       </div>
 
       <div class="field">
-        <label>작업 상태</label>
+        <label data-i18n="label_status">작업 상태</label>
         <button type="button" class="btn" id="status-toggle-btn">🔵 진행중</button>
       </div>
 
       <div class="field-row">
-        <div class="field"><label>투입 인원</label><input type="number" id="f-people" min="1" placeholder="0"></div>
+        <div class="field"><label data-i18n="label_people">투입 인원</label><input type="number" id="f-people" min="1" placeholder="0"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>시작 시간</label><input type="time" id="f-time-start"></div>
-        <div class="field"><label>종료 시간</label><input type="time" id="f-time-end"></div>
+        <div class="field"><label data-i18n="label_time_start">시작 시간</label><input type="time" id="f-time-start"></div>
+        <div class="field"><label data-i18n="label_time_end">종료 시간</label><input type="time" id="f-time-end"></div>
       </div>
 
-      <div class="field"><label>업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀"></div>
+      <div class="field"><label data-i18n="label_company">업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀" data-i18n-placeholder="company_ph"></div>
       <div class="field">
-        <label>감시단 / 안전담당자</label>
+        <label data-i18n="label_supervisor">감시단 / 안전담당자</label>
         <div class="staff-check-list" id="f-supervisor-checks"></div>
-        <div class="hint-text" id="staff-hint" style="display:none;">등록된 담당자가 없습니다. 관리 탭 → 담당자 관리에서 먼저 등록해주세요.</div>
+        <div class="hint-text" id="staff-hint" style="display:none;" data-i18n="staff_hint">등록된 담당자가 없습니다. 관리 탭 → 담당자 관리에서 먼저 등록해주세요.</div>
       </div>
-      <div class="field"><label>메모 (안전조치 등)</label><textarea id="f-note" placeholder="예: 안전대 체결 확인, 신호수 배치"></textarea></div>
+      <div class="field"><label data-i18n="label_note">메모 (안전조치 등)</label><textarea id="f-note" placeholder="예: 안전대 체결 확인, 신호수 배치" data-i18n-placeholder="note_ph"></textarea></div>
 
       <div class="hint-text" id="work-form-error" style="display:none; color:var(--high); font-weight:700;"></div>
 
       <div class="modal-actions">
-        <button class="btn danger" id="delete-btn" style="display:none;">삭제</button>
-        <button class="btn primary" id="save-btn">저장</button>
+        <button class="btn danger" id="delete-btn" style="display:none;" data-i18n="delete_btn">삭제</button>
+        <button class="btn primary" id="save-btn" data-i18n="save_btn">저장</button>
       </div>
     </div>
   </div>
@@ -571,37 +584,37 @@
   <div class="page-view" id="page-status" style="display:none;">
     <div class="page-inner">
       <div class="page-header">
-        <button class="page-back" id="status-back-btn">← 뒤로</button>
-        <h2>작업현황</h2>
+        <button class="page-back" id="status-back-btn" data-i18n="back">← 뒤로</button>
+        <h2 data-i18n="status_title">작업현황</h2>
       </div>
 
       <div class="export-row">
-        <span class="export-label">📥 엑셀 내보내기</span>
-        <button class="btn export-btn" id="export-daily-btn" type="button">일간</button>
-        <button class="btn export-btn" id="export-weekly-btn" type="button">주간</button>
-        <button class="btn export-btn" id="export-monthly-btn" type="button">월간</button>
+        <span class="export-label" data-i18n="export_label">📥 엑셀 내보내기</span>
+        <button class="btn export-btn" id="export-daily-btn" type="button" data-i18n="export_daily">일간</button>
+        <button class="btn export-btn" id="export-weekly-btn" type="button" data-i18n="export_weekly">주간</button>
+        <button class="btn export-btn" id="export-monthly-btn" type="button" data-i18n="export_monthly">월간</button>
       </div>
       <div class="hint-text" id="export-status-text" style="display:none;"></div>
 
       <div class="field">
-        <input type="text" id="status-search" placeholder="작업명 · 업체명 · 위치 · 담당자 검색">
+        <input type="text" id="status-search" placeholder="작업명 · 업체명 · 위치 · 담당자 검색" data-i18n-placeholder="status_search_ph">
       </div>
       <div class="chip-row" id="status-risk-chips">
-        <button class="chip active" data-risk="all" type="button">전체</button>
-        <button class="chip" data-risk="high" type="button">고위험</button>
-        <button class="chip" data-risk="mid" type="button">중위험</button>
-        <button class="chip" data-risk="low" type="button">저위험</button>
+        <button class="chip active" data-risk="all" type="button" data-i18n="risk_all">전체</button>
+        <button class="chip" data-risk="high" type="button" data-i18n="risk_high">고위험</button>
+        <button class="chip" data-risk="mid" type="button" data-i18n="risk_mid">중위험</button>
+        <button class="chip" data-risk="low" type="button" data-i18n="risk_low">저위험</button>
       </div>
 
       <div class="field-row admin-only" style="display:none; margin-bottom:14px;">
-        <button class="btn" id="bulk-select-toggle" style="flex:1;">☑️&nbsp; 일괄 작업 완료</button>
-        <button class="btn danger" id="bulk-delete-toggle" style="flex:1;">🗑️&nbsp; 일괄 삭제</button>
+        <button class="btn" id="bulk-select-toggle" style="flex:1;" data-i18n="bulk_complete_toggle">☑️&nbsp; 일괄 작업 완료</button>
+        <button class="btn danger" id="bulk-delete-toggle" style="flex:1;" data-i18n="bulk_delete_toggle">🗑️&nbsp; 일괄 삭제</button>
       </div>
 
       <div class="bulk-bar" id="bulk-bar" style="display:none;">
         <span id="bulk-count">0건 선택됨</span>
         <div style="display:flex; gap:8px;">
-          <button class="btn" id="bulk-cancel-btn">취소</button>
+          <button class="btn" id="bulk-cancel-btn" data-i18n="cancel">취소</button>
           <button class="btn primary" id="bulk-action-btn">완료 처리</button>
         </div>
       </div>
@@ -614,25 +627,25 @@
   <div class="page-view" id="page-staff" style="display:none;">
     <div class="page-inner">
       <div class="page-header">
-        <button class="page-back" id="staff-page-back-btn">← 뒤로</button>
-        <h2>담당자 관리</h2>
+        <button class="page-back" id="staff-page-back-btn" data-i18n="back">← 뒤로</button>
+        <h2 data-i18n="staff_page_title">담당자 관리</h2>
       </div>
 
       <div id="staff-page-list"></div>
 
-      <button class="btn primary" id="staff-page-add" style="width:100%; justify-content:center; margin-top:8px;">＋ 새 담당자 추가</button>
+      <button class="btn primary" id="staff-page-add" style="width:100%; justify-content:center; margin-top:8px;" data-i18n="staff_add_btn">＋ 새 담당자 추가</button>
     </div>
   </div>
 
   <div class="bottom-tabbar">
     <button class="tab-btn active" id="tab-dashboard">
-      <span class="tab-icon">🏗️</span><span>대시보드</span>
+      <span class="tab-icon">🏗️</span><span data-i18n="tab_dashboard">대시보드</span>
     </button>
     <button class="tab-btn" id="tab-add-work">
-      <span class="tab-icon">✏️</span><span>작업등록</span>
+      <span class="tab-icon">✏️</span><span data-i18n="tab_add_work">작업등록</span>
     </button>
     <button class="tab-btn" id="tab-status">
-      <span class="tab-icon">📋</span><span>작업현황</span>
+      <span class="tab-icon">📋</span><span data-i18n="tab_status">작업현황</span>
     </button>
   </div>
 </div>
@@ -641,10 +654,10 @@
 <div class="modal-backdrop" id="zone-name-backdrop">
   <div class="modal" style="max-width:320px;">
     <button class="btn modal-close-x" id="zone-name-close">✕</button>
-    <h3>위치 이름 입력</h3>
-    <div class="field"><label>이름</label><input type="text" id="zn-name" placeholder="예: A동 3층, 타워크레인 구역"></div>
+    <h3 data-i18n="zone_name_title">위치 이름 입력</h3>
+    <div class="field"><label data-i18n="label_name">이름</label><input type="text" id="zn-name" placeholder="예: A동 3층, 타워크레인 구역" data-i18n-placeholder="zone_name_ph"></div>
     <div class="modal-actions">
-      <button class="btn primary" id="zn-save" style="width:100%;">저장</button>
+      <button class="btn primary" id="zn-save" style="width:100%;" data-i18n="save_btn">저장</button>
     </div>
   </div>
 </div>
@@ -653,9 +666,9 @@
 <div class="modal-backdrop" id="zone-manage-backdrop">
   <div class="modal">
     <button class="btn modal-close-x" id="zone-manage-close">✕</button>
-    <h3>위치 관리</h3>
+    <h3 data-i18n="zone_manage_title">위치 관리</h3>
     <div class="zone-list" id="zone-manage-list"></div>
-    <button class="btn primary" id="zone-manage-add" style="width:100%; justify-content:center;">＋ 새 위치 추가</button>
+    <button class="btn primary" id="zone-manage-add" style="width:100%; justify-content:center;" data-i18n="zone_add_btn">＋ 새 위치 추가</button>
   </div>
 </div>
 
@@ -665,7 +678,7 @@
     <button class="btn modal-close-x" id="zone-detail-close">✕</button>
     <h3 id="zone-detail-title">위치</h3>
     <div class="zwork-list" id="zone-detail-list"></div>
-    <button class="btn primary" id="zone-detail-add" style="width:100%; justify-content:center;">＋ 이 위치에 작업 추가</button>
+    <button class="btn primary" id="zone-detail-add" style="width:100%; justify-content:center;" data-i18n="zone_detail_add_btn">＋ 이 위치에 작업 추가</button>
   </div>
 </div>
 
@@ -673,14 +686,14 @@
 <div class="modal-backdrop" id="admin-pin-backdrop">
   <div class="modal" style="max-width:300px;">
     <button class="btn modal-close-x" id="admin-pin-close">✕</button>
-    <h3>관리자 PIN 입력</h3>
+    <h3 data-i18n="admin_pin_title">관리자 PIN 입력</h3>
     <div class="field">
-      <label>PIN 코드</label>
+      <label data-i18n="admin_pin_label">PIN 코드</label>
       <input type="password" id="admin-pin-input" placeholder="••••" inputmode="numeric">
     </div>
-    <div class="hint-text" id="admin-pin-error" style="display:none; color:var(--high);">PIN이 올바르지 않습니다.</div>
+    <div class="hint-text" id="admin-pin-error" style="display:none; color:var(--high);" data-i18n="admin_pin_error">PIN이 올바르지 않습니다.</div>
     <div class="modal-actions">
-      <button class="btn primary" id="admin-pin-submit" style="width:100%;">확인</button>
+      <button class="btn primary" id="admin-pin-submit" style="width:100%;" data-i18n="confirm_btn">확인</button>
     </div>
   </div>
 </div>
@@ -689,20 +702,20 @@
 <div class="modal-backdrop" id="staff-name-backdrop">
   <div class="modal" style="max-width:320px;">
     <button class="btn modal-close-x" id="staff-name-close">✕</button>
-    <h3>담당자 등록</h3>
-    <div class="field"><label>이름</label><input type="text" id="sn-name" placeholder="예: 김경호"></div>
+    <h3 data-i18n="staff_modal_title">담당자 등록</h3>
+    <div class="field"><label data-i18n="label_name">이름</label><input type="text" id="sn-name" placeholder="예: 김경호" data-i18n-placeholder="staff_name_ph"></div>
     <div class="field">
-      <label>역할</label>
+      <label data-i18n="label_role">역할</label>
       <select id="sn-role">
-        <option value="관리감독자">관리감독자</option>
-        <option value="안전관리자">안전관리자</option>
-        <option value="안전감시단">안전감시단</option>
-        <option value="안전보건총괄책임자">안전보건총괄책임자</option>
+        <option value="관리감독자" data-i18n="role_supervisor">관리감독자</option>
+        <option value="안전관리자" data-i18n="role_safety_manager">안전관리자</option>
+        <option value="안전감시단" data-i18n="role_safety_watch">안전감시단</option>
+        <option value="안전보건총괄책임자" data-i18n="role_safety_chief">안전보건총괄책임자</option>
       </select>
     </div>
-    <div class="hint-text" id="sn-error" style="display:none; color:var(--high);">저장 실패. 관리자 콘솔에서 Firestore 규칙을 확인해주세요.</div>
+    <div class="hint-text" id="sn-error" style="display:none; color:var(--high);" data-i18n="staff_save_error">저장 실패. 관리자 콘솔에서 Firestore 규칙을 확인해주세요.</div>
     <div class="modal-actions">
-      <button class="btn primary" id="sn-save" style="width:100%;">저장</button>
+      <button class="btn primary" id="sn-save" style="width:100%;" data-i18n="save_btn">저장</button>
     </div>
   </div>
 </div>
@@ -712,13 +725,13 @@
 <div class="modal-backdrop" id="manage-panel-backdrop">
   <div class="modal" style="max-width:320px;">
     <button class="btn modal-close-x" id="manage-panel-close">✕</button>
-    <h3>🔧 관리자 패널</h3>
+    <h3 data-i18n="manage_panel_title">🔧 관리자 패널</h3>
     <div class="mgmt-actions">
-      <button class="btn" id="mp-upload-map">🛰️&nbsp; 지도 업로드 / 교체</button>
-      <button class="btn" id="mp-manage-zones">📍&nbsp; 위치(구역) 관리</button>
-      <button class="btn" id="mp-manage-staff">👷&nbsp; 담당자 관리</button>
-      <button class="btn" id="mp-excel-import">📊&nbsp; 엑셀로 작업 일괄 등록</button>
-      <button class="btn danger" id="mp-admin-off">🔓&nbsp; 관리자 모드 끄기</button>
+      <button class="btn" id="mp-upload-map" data-i18n="mp_upload_map">🛰️&nbsp; 지도 업로드 / 교체</button>
+      <button class="btn" id="mp-manage-zones" data-i18n="mp_manage_zones">📍&nbsp; 위치(구역) 관리</button>
+      <button class="btn" id="mp-manage-staff" data-i18n="mp_manage_staff">👷&nbsp; 담당자 관리</button>
+      <button class="btn" id="mp-excel-import" data-i18n="mp_excel_import">📊&nbsp; 엑셀로 작업 일괄 등록</button>
+      <button class="btn danger" id="mp-admin-off" data-i18n="mp_admin_off">🔓&nbsp; 관리자 모드 끄기</button>
     </div>
     <input type="file" id="excel-input" accept=".xlsx,.xls" style="display:none;">
     <div class="hint-text" id="excel-import-status" style="display:none;"></div>
@@ -775,6 +788,454 @@ const db = getFirestore(fbApp);
   let siteNameFromRemote = '';
   let suppressSiteNameEcho = false;
 
+  // ---------------- i18n (한국어 / 中文 / English) ----------------
+  let LANG = 'ko';
+  try {
+    const savedLang = localStorage.getItem('safetytop_lang');
+    if (savedLang && ['ko','zh','en'].includes(savedLang)) LANG = savedLang;
+  } catch (e) {}
+
+  const I18N = {
+    ko: {
+      manage_title: "관리",
+      site_name_ph: "현장명 입력",
+      empty_upload_btn: "이미지 업로드",
+      empty_title: "위성지도를 업로드하세요",
+      empty_desc_admin: "구글맵 또는 네이버맵에서 현장을 위성/항공 뷰로 띄운 뒤 화면을 캡처해서 올려주세요. 이후엔 계속 저장되어 다시 올릴 필요 없어요.",
+      empty_title_noadmin: "위성지도가 아직 없습니다",
+      empty_desc_noadmin: "관리자가 위성지도를 업로드하면 여기에 표시됩니다.",
+      place_hint_reposition: "이동할 위치를 지도에서 클릭하세요",
+      place_hint_default: "지도를 클릭해서 위치를 지정하세요",
+      cancel: "취소",
+      area_draw_hint: "지도를 드래그해서 작업범위를 표시하세요",
+      sidebar_title: "주요 작업목록",
+      sidebar_subtitle: "고위험 작업만 표시됩니다",
+      stat_total_people: "총 출역 인원",
+      stat_high_people: "고위험 작업 인원",
+      stat_total_works: "전체 작업 건수",
+      stat_high: "고위험 건수",
+      stat_mid: "중위험 건수",
+      stat_low: "저위험 건수",
+      back: "← 뒤로",
+      work_add_title: "위험작업 등록",
+      label_location: "위치",
+      label_worktype: "작업 내용",
+      label_risk: "위험도",
+      new_zone_btn: "＋ 새 위치",
+      zone_hint: "등록된 위치가 없습니다. \"새 위치\"로 먼저 만들어주세요.",
+      worktype_ph: "예: 3층 외벽 비계 설치",
+      risk_high: "고위험",
+      risk_mid: "중위험",
+      risk_low: "저위험",
+      label_area: "작업 범위 표시 (선택)",
+      draw_area_btn: "🗺️ 지도에서 범위 그리기",
+      label_status: "작업 상태",
+      label_people: "투입 인원",
+      label_time_start: "시작 시간",
+      label_time_end: "종료 시간",
+      label_company: "업체 / 팀명",
+      company_ph: "예: OO건설 철골팀",
+      label_supervisor: "감시단 / 안전담당자",
+      staff_hint: "등록된 담당자가 없습니다. 관리 탭 → 담당자 관리에서 먼저 등록해주세요.",
+      label_note: "메모 (안전조치 등)",
+      note_ph: "예: 안전대 체결 확인, 신호수 배치",
+      delete_btn: "삭제",
+      save_btn: "저장",
+      status_title: "작업현황",
+      export_label: "📥 엑셀 내보내기",
+      export_daily: "일간",
+      export_weekly: "주간",
+      export_monthly: "월간",
+      status_search_ph: "작업명 · 업체명 · 위치 · 담당자 검색",
+      risk_all: "전체",
+      bulk_complete_toggle: "☑️  일괄 작업 완료",
+      bulk_delete_toggle: "🗑️  일괄 삭제",
+      staff_page_title: "담당자 관리",
+      staff_add_btn: "＋ 새 담당자 추가",
+      tab_dashboard: "대시보드",
+      tab_add_work: "작업등록",
+      tab_status: "작업현황",
+      zone_name_title: "위치 이름 입력",
+      label_name: "이름",
+      zone_name_ph: "예: A동 3층, 타워크레인 구역",
+      zone_manage_title: "위치 관리",
+      zone_add_btn: "＋ 새 위치 추가",
+      zone_detail_add_btn: "＋ 이 위치에 작업 추가",
+      admin_pin_title: "관리자 PIN 입력",
+      admin_pin_label: "PIN 코드",
+      admin_pin_error: "PIN이 올바르지 않습니다.",
+      confirm_btn: "확인",
+      staff_modal_title: "담당자 등록",
+      staff_name_ph: "예: 김경호",
+      label_role: "역할",
+      role_supervisor: "관리감독자",
+      role_safety_manager: "안전관리자",
+      role_safety_watch: "안전감시단",
+      role_safety_chief: "안전보건총괄책임자",
+      role_other: "기타",
+      staff_save_error: "저장 실패. 관리자 콘솔에서 Firestore 규칙을 확인해주세요.",
+      manage_panel_title: "🔧 관리자 패널",
+      mp_upload_map: "🛰️  지도 업로드 / 교체",
+      mp_manage_zones: "📍  위치(구역) 관리",
+      mp_manage_staff: "👷  담당자 관리",
+      mp_excel_import: "📊  엑셀로 작업 일괄 등록",
+      mp_admin_off: "🔓  관리자 모드 끄기",
+      status_done: "완료",
+      status_inprogress: "진행중",
+      area_set_msg: "범위가 지정되었습니다.",
+      area_clear_link: "지우기",
+      area_redraw_btn: "🗺️ 범위 다시 그리기",
+      zone_manage_empty: "등록된 위치가 없습니다.",
+      title_move: "위치 이동",
+      title_rename: "이름 변경",
+      title_delete: "삭제",
+      save_failed_prefix: "저장 실패: ",
+      unknown_error: "알 수 없는 오류",
+      staff_empty: "등록된 담당자가 없습니다.",
+      unit_people: "명",
+      title_edit: "수정",
+      location_fallback: "위치",
+      zone_detail_empty: "등록된 작업이 없습니다.",
+      worktype_empty: "작업 내용 미입력",
+      unit_cases: "건",
+      sidebar_empty: "고위험 작업이 없습니다.",
+      no_location_option: "등록된 위치가 없습니다",
+      work_fallback: "작업",
+      legend_high: "고위험",
+      legend_empty_zone: "미배정 위치",
+      status_empty: "조건에 맞는 작업이 없습니다.",
+      company_unassigned: "업체 미지정",
+      supervisor_label: "담당자",
+      copy_work_btn: "복사해서 등록",
+      bulk_count_suffix: "건 선택됨",
+      bulk_complete_action: "완료 처리",
+      excel_reading: "⏳ 엑셀 파일을 읽는 중...",
+      excel_no_target_rows: '⚠ "점검대상"이 T로 표시된 행이 없습니다.',
+      excel_import_confirm: (count, date) => `${date} 날짜로 ${count}건의 작업을 등록하시겠습니까?`,
+      excel_registering: (count) => `⏳ ${count}건 등록 중...`,
+      excel_result_partial: (success, fail) => `✅ ${success}건 등록 완료, ⚠ ${fail}건 실패`,
+      excel_result_success: (success) => `✅ ${success}건 등록 완료`,
+      excel_read_error: "⚠ 엑셀 파일을 읽는 중 오류가 발생했습니다.",
+      export_loading: "⏳ 데이터를 불러오는 중...",
+      export_no_data: (startDate, endDate) => `⚠ ${startDate} ~ ${endDate} 기간에 등록된 작업이 없습니다.`,
+      export_sheet_name: "작업목록",
+      export_success: (startDate, endDate, count) => `✅ ${startDate} ~ ${endDate} 기간 ${count}건 내보내기 완료`,
+      export_error: "⚠ 내보내기 중 오류가 발생했습니다.",
+      bulk_delete_confirm: (count) => `선택한 작업 ${count}건을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.`
+    },
+    zh: {
+      manage_title: "管理",
+      site_name_ph: "输入现场名称",
+      empty_upload_btn: "上传图片",
+      empty_title: "请上传卫星地图",
+      empty_desc_admin: "请在谷歌地图或Naver地图中以卫星/航拍视图打开现场后截图上传。上传后会一直保存，无需重复上传。",
+      empty_title_noadmin: "暂无卫星地图",
+      empty_desc_noadmin: "管理员上传卫星地图后将显示在此处。",
+      place_hint_reposition: "请在地图上点击要移动到的位置",
+      place_hint_default: "请点击地图以指定位置",
+      cancel: "取消",
+      area_draw_hint: "请拖动地图以标出作业范围",
+      sidebar_title: "主要作业列表",
+      sidebar_subtitle: "仅显示高风险作业",
+      stat_total_people: "总出勤人数",
+      stat_high_people: "高风险作业人数",
+      stat_total_works: "全部作业件数",
+      stat_high: "高风险件数",
+      stat_mid: "中风险件数",
+      stat_low: "低风险件数",
+      back: "← 返回",
+      work_add_title: "登记危险作业",
+      label_location: "位置",
+      label_worktype: "作业内容",
+      label_risk: "风险等级",
+      new_zone_btn: "＋ 新位置",
+      zone_hint: "尚未登记位置。请先通过“新位置”创建。",
+      worktype_ph: "例：3楼外墙脚手架安装",
+      risk_high: "高风险",
+      risk_mid: "中风险",
+      risk_low: "低风险",
+      label_area: "标注作业范围（可选）",
+      draw_area_btn: "🗺️ 在地图上绘制范围",
+      label_status: "作业状态",
+      label_people: "投入人数",
+      label_time_start: "开始时间",
+      label_time_end: "结束时间",
+      label_company: "公司 / 团队名称",
+      company_ph: "例：OO建设 钢结构组",
+      label_supervisor: "监督员 / 安全负责人",
+      staff_hint: "尚未登记负责人。请先在管理标签 → 负责人管理中登记。",
+      label_note: "备注（安全措施等）",
+      note_ph: "例：确认安全带扣紧，配置信号员",
+      delete_btn: "删除",
+      save_btn: "保存",
+      status_title: "作业现况",
+      export_label: "📥 导出Excel",
+      export_daily: "日",
+      export_weekly: "周",
+      export_monthly: "月",
+      status_search_ph: "搜索作业名·公司·位置·负责人",
+      risk_all: "全部",
+      bulk_complete_toggle: "☑️  批量完成作业",
+      bulk_delete_toggle: "🗑️  批量删除",
+      staff_page_title: "负责人管理",
+      staff_add_btn: "＋ 新增负责人",
+      tab_dashboard: "仪表盘",
+      tab_add_work: "登记作业",
+      tab_status: "作业现况",
+      zone_name_title: "输入位置名称",
+      label_name: "姓名",
+      zone_name_ph: "例：A栋3楼，塔吊区域",
+      zone_manage_title: "位置管理",
+      zone_add_btn: "＋ 新增位置",
+      zone_detail_add_btn: "＋ 在此位置新增作业",
+      admin_pin_title: "输入管理员PIN码",
+      admin_pin_label: "PIN码",
+      admin_pin_error: "PIN码不正确。",
+      confirm_btn: "确认",
+      staff_modal_title: "登记负责人",
+      staff_name_ph: "例：金敬浩",
+      label_role: "角色",
+      role_supervisor: "管理监督人",
+      role_safety_manager: "安全管理员",
+      role_safety_watch: "安全监视团",
+      role_safety_chief: "安全保健总责人",
+      role_other: "其他",
+      staff_save_error: "保存失败。请在管理控制台确认Firestore规则。",
+      manage_panel_title: "🔧 管理员面板",
+      mp_upload_map: "🛰️  上传/更换地图",
+      mp_manage_zones: "📍  位置（区域）管理",
+      mp_manage_staff: "👷  负责人管理",
+      mp_excel_import: "📊  通过Excel批量登记作业",
+      mp_admin_off: "🔓  关闭管理员模式",
+      status_done: "已完成",
+      status_inprogress: "进行中",
+      area_set_msg: "已设置作业范围。",
+      area_clear_link: "清除",
+      area_redraw_btn: "🗺️ 重新绘制范围",
+      zone_manage_empty: "尚未登记位置。",
+      title_move: "移动位置",
+      title_rename: "重命名",
+      title_delete: "删除",
+      save_failed_prefix: "保存失败：",
+      unknown_error: "未知错误",
+      staff_empty: "尚未登记负责人。",
+      unit_people: "人",
+      title_edit: "编辑",
+      location_fallback: "位置",
+      zone_detail_empty: "暂无登记的作业。",
+      worktype_empty: "未填写作业内容",
+      unit_cases: "件",
+      sidebar_empty: "暂无高风险作业。",
+      no_location_option: "尚未登记位置",
+      work_fallback: "作业",
+      legend_high: "高风险",
+      legend_empty_zone: "未分配位置",
+      status_empty: "没有符合条件的作业。",
+      company_unassigned: "未指定公司",
+      supervisor_label: "负责人",
+      copy_work_btn: "复制后登记",
+      bulk_count_suffix: "件已选择",
+      bulk_complete_action: "标记完成",
+      excel_reading: "⏳ 正在读取Excel文件...",
+      excel_no_target_rows: '⚠ 没有"检查对象"标记为T的行。',
+      excel_import_confirm: (count, date) => `是否要以${date}日期登记${count}件作业？`,
+      excel_registering: (count) => `⏳ 正在登记${count}件...`,
+      excel_result_partial: (success, fail) => `✅ 成功登记${success}件，⚠ 失败${fail}件`,
+      excel_result_success: (success) => `✅ 成功登记${success}件`,
+      excel_read_error: "⚠ 读取Excel文件时发生错误。",
+      export_loading: "⏳ 正在加载数据...",
+      export_no_data: (startDate, endDate) => `⚠ ${startDate} ~ ${endDate} 期间没有登记的作业。`,
+      export_sheet_name: "作业列表",
+      export_success: (startDate, endDate, count) => `✅ 已导出${startDate} ~ ${endDate}期间共${count}件`,
+      export_error: "⚠ 导出时发生错误。",
+      bulk_delete_confirm: (count) => `确定要删除已选择的${count}件作业吗？\n删除后将无法恢复。`
+    },
+    en: {
+      manage_title: "Manage",
+      site_name_ph: "Enter site name",
+      empty_upload_btn: "Upload image",
+      empty_title: "Upload a satellite map",
+      empty_desc_admin: "Open the site in satellite/aerial view on Google Maps or Naver Map, capture the screen, and upload it here. Once uploaded, it stays saved — no need to upload again.",
+      empty_title_noadmin: "No satellite map yet",
+      empty_desc_noadmin: "It will appear here once an admin uploads a satellite map.",
+      place_hint_reposition: "Click the map at the new location",
+      place_hint_default: "Click the map to set a location",
+      cancel: "Cancel",
+      area_draw_hint: "Drag on the map to mark the work area",
+      sidebar_title: "Key work list",
+      sidebar_subtitle: "Only high-risk work is shown",
+      stat_total_people: "Total workers",
+      stat_high_people: "High-risk work workers",
+      stat_total_works: "Total work items",
+      stat_high: "High-risk count",
+      stat_mid: "Mid-risk count",
+      stat_low: "Low-risk count",
+      back: "← Back",
+      work_add_title: "Register hazardous work",
+      label_location: "Location",
+      label_worktype: "Work description",
+      label_risk: "Risk level",
+      new_zone_btn: "＋ New location",
+      zone_hint: "No locations registered yet. Create one with \"New location\" first.",
+      worktype_ph: "e.g. Scaffolding install on 3F exterior wall",
+      risk_high: "High risk",
+      risk_mid: "Mid risk",
+      risk_low: "Low risk",
+      label_area: "Mark work area (optional)",
+      draw_area_btn: "🗺️ Draw area on map",
+      label_status: "Work status",
+      label_people: "Workers assigned",
+      label_time_start: "Start time",
+      label_time_end: "End time",
+      label_company: "Company / team",
+      company_ph: "e.g. OO Construction Steel Team",
+      label_supervisor: "Safety watch / supervisor",
+      staff_hint: "No staff registered yet. Register them under Manage → Staff Management first.",
+      label_note: "Notes (safety measures, etc.)",
+      note_ph: "e.g. Confirm harness attached, signal person placed",
+      delete_btn: "Delete",
+      save_btn: "Save",
+      status_title: "Work status",
+      export_label: "📥 Export to Excel",
+      export_daily: "Daily",
+      export_weekly: "Weekly",
+      export_monthly: "Monthly",
+      status_search_ph: "Search work · company · location · supervisor",
+      risk_all: "All",
+      bulk_complete_toggle: "☑️  Bulk complete",
+      bulk_delete_toggle: "🗑️  Bulk delete",
+      staff_page_title: "Staff management",
+      staff_add_btn: "＋ Add staff",
+      tab_dashboard: "Dashboard",
+      tab_add_work: "Add work",
+      tab_status: "Status",
+      zone_name_title: "Enter location name",
+      label_name: "Name",
+      zone_name_ph: "e.g. Building A 3F, Tower crane area",
+      zone_manage_title: "Manage locations",
+      zone_add_btn: "＋ Add location",
+      zone_detail_add_btn: "＋ Add work at this location",
+      admin_pin_title: "Enter admin PIN",
+      admin_pin_label: "PIN code",
+      admin_pin_error: "Incorrect PIN.",
+      confirm_btn: "Confirm",
+      staff_modal_title: "Register staff",
+      staff_name_ph: "e.g. Kim Kyung-ho",
+      label_role: "Role",
+      role_supervisor: "Site supervisor",
+      role_safety_manager: "Safety manager",
+      role_safety_watch: "Safety watch",
+      role_safety_chief: "Chief safety officer",
+      role_other: "Other",
+      staff_save_error: "Save failed. Please check Firestore rules in the admin console.",
+      manage_panel_title: "🔧 Admin panel",
+      mp_upload_map: "🛰️  Upload / replace map",
+      mp_manage_zones: "📍  Manage locations",
+      mp_manage_staff: "👷  Manage staff",
+      mp_excel_import: "📊  Bulk register work from Excel",
+      mp_admin_off: "🔓  Turn off admin mode",
+      status_done: "Done",
+      status_inprogress: "In progress",
+      area_set_msg: "Area has been set.",
+      area_clear_link: "Clear",
+      area_redraw_btn: "🗺️ Redraw area",
+      zone_manage_empty: "No locations registered.",
+      title_move: "Move location",
+      title_rename: "Rename",
+      title_delete: "Delete",
+      save_failed_prefix: "Save failed: ",
+      unknown_error: "Unknown error",
+      staff_empty: "No staff registered.",
+      unit_people: " workers",
+      title_edit: "Edit",
+      location_fallback: "Location",
+      zone_detail_empty: "No work registered.",
+      worktype_empty: "No work description",
+      unit_cases: " item(s)",
+      sidebar_empty: "No high-risk work.",
+      no_location_option: "No locations registered",
+      work_fallback: "Work",
+      legend_high: "High risk",
+      legend_empty_zone: "Unassigned location",
+      status_empty: "No matching work found.",
+      company_unassigned: "Unassigned company",
+      supervisor_label: "Supervisor",
+      copy_work_btn: "Duplicate & register",
+      bulk_count_suffix: " selected",
+      bulk_complete_action: "Mark complete",
+      excel_reading: "⏳ Reading Excel file...",
+      excel_no_target_rows: '⚠ No rows with "inspection target" marked T.',
+      excel_import_confirm: (count, date) => `Register ${count} work item(s) for ${date}?`,
+      excel_registering: (count) => `⏳ Registering ${count} item(s)...`,
+      excel_result_partial: (success, fail) => `✅ ${success} registered, ⚠ ${fail} failed`,
+      excel_result_success: (success) => `✅ ${success} registered`,
+      excel_read_error: "⚠ An error occurred while reading the Excel file.",
+      export_loading: "⏳ Loading data...",
+      export_no_data: (startDate, endDate) => `⚠ No work registered between ${startDate} and ${endDate}.`,
+      export_sheet_name: "Work List",
+      export_success: (startDate, endDate, count) => `✅ Exported ${count} item(s) for ${startDate} ~ ${endDate}`,
+      export_error: "⚠ An error occurred while exporting.",
+      bulk_delete_confirm: (count) => `Delete ${count} selected work item(s)?\nThis cannot be undone.`
+    }
+  };
+
+  function t(key){
+    if(I18N[LANG] && I18N[LANG][key] !== undefined) return I18N[LANG][key];
+    if(I18N.ko[key] !== undefined) return I18N.ko[key];
+    return key;
+  }
+
+  function roleLabel(role){
+    const map = {
+      '관리감독자': 'role_supervisor',
+      '안전관리자': 'role_safety_manager',
+      '안전감시단': 'role_safety_watch',
+      '안전보건총괄책임자': 'role_safety_chief'
+    };
+    const key = map[role];
+    if(key) return t(key);
+    return role || t('role_other') || '기타';
+  }
+
+  function applyI18n(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+      el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+      el.title = t(el.dataset.i18nTitle);
+    });
+    try{ document.documentElement.lang = LANG; }catch(e){}
+    document.querySelectorAll('.lang-btn').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.lang === LANG);
+    });
+
+    const safeCall = (fn)=>{ try{ if(typeof fn === 'function') fn(); }catch(e){ console.error('applyI18n refresh failed', e); } };
+    safeCall(typeof renderAllPins === 'function' ? renderAllPins : null);
+    safeCall(typeof renderSidebar === 'function' ? renderSidebar : null);
+    safeCall(typeof renderStatusList === 'function' ? renderStatusList : null);
+    safeCall(typeof renderLegend === 'function' ? renderLegend : null);
+    safeCall(typeof renderStaffPageList === 'function' ? renderStaffPageList : null);
+    safeCall(typeof renderZoneManageList === 'function' ? renderZoneManageList : null);
+    safeCall(typeof updateRiskButtons === 'function' ? updateRiskButtons : null);
+    safeCall(typeof updateStatusToggleBtn === 'function' ? updateStatusToggleBtn : null);
+    safeCall(typeof updateAreaStatusText === 'function' ? updateAreaStatusText : null);
+    safeCall(typeof setAdminUI === 'function' ? setAdminUI : null);
+  }
+
+  function setLanguage(lang){
+    if(!['ko','zh','en'].includes(lang)) return;
+    LANG = lang;
+    try{ localStorage.setItem('safetytop_lang', lang); }catch(e){}
+    applyI18n();
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> setLanguage(btn.dataset.lang));
+  });
+
   // ---------------- admin mode ----------------
   // NOTE: this is a lightweight UI gate, not real security — anyone who reads
   // this file's source can find the PIN. Change it to something private below.
@@ -789,11 +1250,11 @@ const db = getFirestore(fbApp);
     });
     if(!mapImageURL){
       if(isAdmin){
-        $('empty-title').textContent = '위성지도를 업로드하세요';
-        $('empty-desc').textContent = '구글맵 또는 네이버맵에서 현장을 위성/항공 뷰로 띄운 뒤 화면을 캡처해서 올려주세요.';
+        $('empty-title').textContent = t('empty_title');
+        $('empty-desc').textContent = t('empty_desc_admin');
       } else {
-        $('empty-title').textContent = '아직 지도가 등록되지 않았습니다';
-        $('empty-desc').textContent = '관리자가 위성지도를 업로드하면 여기에 표시됩니다. 현장 관리자에게 문의해주세요.';
+        $('empty-title').textContent = t('empty_title_noadmin');
+        $('empty-desc').textContent = t('empty_desc_noadmin');
       }
     }
   }
@@ -875,7 +1336,7 @@ const db = getFirestore(fbApp);
     const statusEl = $('excel-import-status');
     statusEl.style.display = 'block';
     statusEl.style.color = '';
-    statusEl.textContent = '📂 엑셀 파일을 읽는 중...';
+    statusEl.textContent = t('excel_reading');
     try{
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: 'array' });
@@ -885,14 +1346,14 @@ const db = getFirestore(fbApp);
       const targetRows = rows.filter(r => String(r['점검대상']).trim().toUpperCase() === 'T');
       if(targetRows.length === 0){
         statusEl.style.color = 'var(--high)';
-        statusEl.textContent = '⚠ "점검대상"이 T인 행을 찾지 못했습니다. 파일 형식을 확인해주세요.';
+        statusEl.textContent = t('excel_no_target_rows');
         return;
       }
 
-      const ok = confirm(`"점검대상=T" 행 ${targetRows.length}건을 오늘 날짜(${currentDate})의 작업으로 등록합니다.\n(위치/인원/시간/담당자/메모는 비워둔 채 등록되며, 등록 후 각 항목에서 직접 채워주셔야 합니다)\n\n계속할까요?`);
+      const ok = confirm(t('excel_import_confirm')(targetRows.length, currentDate));
       if(!ok){ statusEl.style.display = 'none'; return; }
 
-      statusEl.textContent = `⏳ ${targetRows.length}건 등록 중...`;
+      statusEl.textContent = t('excel_registering')(targetRows.length);
       let success = 0, fail = 0;
       for(const r of targetRows){
         const risk = RISK_GRADE_MAP[String(r['위험성등급']).trim()] || 'mid';
@@ -915,12 +1376,12 @@ const db = getFirestore(fbApp);
       }
       statusEl.style.color = fail ? 'var(--high)' : 'var(--ok, #16a34a)';
       statusEl.textContent = fail
-        ? `✅ ${success}건 등록 완료, ⚠ ${fail}건 실패`
-        : `✅ ${success}건 등록 완료! 대시보드/작업현황에서 확인 후, 위치·인원·시간 등을 채워주세요.`;
+        ? t('excel_result_partial')(success, fail)
+        : t('excel_result_success')(success);
     }catch(err){
       console.error('excel import failed', err);
       statusEl.style.color = 'var(--high)';
-      statusEl.textContent = '⚠ 엑셀 파일을 읽는 중 오류가 발생했습니다. 파일 형식을 확인해주세요.';
+      statusEl.textContent = t('excel_read_error');
     }
   });
   $('mp-admin-off').addEventListener('click', ()=>{ isAdmin = false; setAdminUI(); closeManagePanel(); });
@@ -1200,13 +1661,13 @@ const db = getFirestore(fbApp);
     const btn = $('draw-area-btn');
     if(pendingArea){
       el.style.display = 'block';
-      el.innerHTML = '✅ 작업범위가 지정되었습니다. <a href="#" id="area-clear-link" style="color:var(--high); font-weight:600;">범위 삭제</a>';
-      btn.textContent = '🗺️ 범위 다시 그리기';
+      el.innerHTML = `✅ ${t('area_set_msg')} <a href="#" id="area-clear-link" style="color:var(--high); font-weight:600;">${t('area_clear_link')}</a>`;
+      btn.textContent = t('area_redraw_btn');
       const clearLink = $('area-clear-link');
       if(clearLink) clearLink.addEventListener('click', (e)=>{ e.preventDefault(); pendingArea = null; updateAreaStatusText(); });
     } else {
       el.style.display = 'none';
-      btn.textContent = '🗺️ 지도에서 범위 그리기';
+      btn.textContent = t('draw_area_btn');
     }
   }
   $('draw-area-btn').addEventListener('click', startAreaDrawing);
@@ -1225,7 +1686,7 @@ const db = getFirestore(fbApp);
     if(!mapImageURL) return;
     repositioningZoneId = zoneId;
     placing = true;
-    $('place-hint-text').textContent = '지도를 클릭해서 새 위치를 지정하세요';
+    $('place-hint-text').textContent = t('place_hint_reposition');
     placeHint.classList.add('show');
     mapWrap.classList.add('place-cursor');
     hideWorkPage();
@@ -1234,7 +1695,7 @@ const db = getFirestore(fbApp);
   function cancelPlacing(){
     placing = false;
     repositioningZoneId = null;
-    $('place-hint-text').textContent = '지도를 클릭해서 위치를 지정하세요';
+    $('place-hint-text').textContent = t('place_hint_default');
     placeHint.classList.remove('show');
     mapWrap.classList.remove('place-cursor');
   }
@@ -1334,7 +1795,7 @@ const db = getFirestore(fbApp);
     const list = $('zone-manage-list');
     list.innerHTML = '';
     if(zones.length === 0){
-      list.innerHTML = '<div class="zone-empty">등록된 위치가 없습니다. 아래 버튼으로 지도에 위치를 추가해보세요.</div>';
+      list.innerHTML = `<div class="zone-empty">${t('zone_manage_empty')}</div>`;
       return;
     }
     zones.forEach(z=>{
@@ -1342,9 +1803,9 @@ const db = getFirestore(fbApp);
       row.className = 'zone-row';
       row.innerHTML = `<span class="name">📍 ${escapeHTML(z.name)}</span>
         <span class="zone-actions">
-          <button data-act="move" title="위치 이동">📌</button>
-          <button data-act="rename" title="이름변경">✏️</button>
-          <button data-act="delete" title="삭제">🗑️</button>
+          <button data-act="move" title="${t('title_move')}">📌</button>
+          <button data-act="rename" title="${t('title_rename')}">✏️</button>
+          <button data-act="delete" title="${t('title_delete')}">🗑️</button>
         </span>`;
       row.querySelector('[data-act="move"]').addEventListener('click', ()=>{
         startRepositioning(z.id);
@@ -1408,7 +1869,7 @@ const db = getFirestore(fbApp);
       staffEditId = null;
     }catch(e){
       console.error('staff save failed', e);
-      $('sn-error').textContent = '저장 실패: ' + (e && e.message ? e.message : '알 수 없는 오류');
+      $('sn-error').textContent = t('save_failed_prefix') + (e && e.message ? e.message : t('unknown_error'));
       $('sn-error').style.display = 'block';
     }
   });
@@ -1418,7 +1879,7 @@ const db = getFirestore(fbApp);
     if(!list) return;
     list.innerHTML = '';
     if(staffList.length === 0){
-      list.innerHTML = '<div class="status-empty">등록된 담당자가 없습니다.<br>아래 "＋ 새 담당자 추가"로 등록해보세요.</div>';
+      list.innerHTML = `<div class="status-empty">${t('staff_empty')}</div>`;
       return;
     }
 
@@ -1434,7 +1895,7 @@ const db = getFirestore(fbApp);
       if(people.length === 0) return;
       const groupEl = document.createElement('div');
       groupEl.className = 'status-group';
-      groupEl.innerHTML = `<div class="status-group-head">${escapeHTML(role)}<span class="cnt">${people.length}명</span></div>`;
+      groupEl.innerHTML = `<div class="status-group-head">${escapeHTML(roleLabel(role))}<span class="cnt">${people.length}${t('unit_people')}</span></div>`;
       const rowsWrap = document.createElement('div');
       rowsWrap.className = 'zone-list';
       people.forEach(s=>{
@@ -1442,8 +1903,8 @@ const db = getFirestore(fbApp);
         row.className = 'zone-row';
         row.innerHTML = `<span class="name">👷 ${escapeHTML(s.name)}</span>
           <span class="zone-actions">
-            <button data-act="edit" title="수정">✏️</button>
-            <button data-act="delete" title="삭제">🗑️</button>
+            <button data-act="edit" title="${t('title_edit')}">✏️</button>
+            <button data-act="delete" title="${t('title_delete')}">🗑️</button>
           </span>`;
         row.querySelector('[data-act="edit"]').addEventListener('click', ()=>{
           staffEditId = s.id;
@@ -1479,7 +1940,7 @@ const db = getFirestore(fbApp);
       label.className = 'staff-chip';
       const checked = selectedNames.includes(s.name);
       if(checked) label.classList.add('checked');
-      label.innerHTML = `<input type="checkbox" value="${escapeHTML(s.name)}" ${checked?'checked':''}> ${escapeHTML(s.name)} <span class="role-tag">${escapeHTML(s.role||'')}</span>`;
+      label.innerHTML = `<input type="checkbox" value="${escapeHTML(s.name)}" ${checked?'checked':''}> ${escapeHTML(s.name)} <span class="role-tag">${escapeHTML(roleLabel(s.role||''))}</span>`;
       label.querySelector('input').addEventListener('change', (e)=>{
         label.classList.toggle('checked', e.target.checked);
       });
@@ -1489,7 +1950,7 @@ const db = getFirestore(fbApp);
 
   // ---------------- pins on map ----------------
   function riskRank(r){ return r==='high'?0:r==='mid'?1:2; }
-  function riskLabel(r){ return r==='high'?'고위험':r==='mid'?'중위험':'저위험'; }
+  function riskLabel(r){ return r==='high'?t('risk_high'):r==='mid'?t('risk_mid'):t('risk_low'); }
 
   // ---------------- company colors ----------------
   const COMPANY_PALETTE = ['#2563EB','#059669','#D97706','#7C3AED','#DB2777','#0D9488','#DC2626','#4B5563','#65A30D','#0891B2'];
@@ -1563,7 +2024,7 @@ const db = getFirestore(fbApp);
       pin.style.top = pinY + '%';
       const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
       const labelText = [m.company, zone ? zone.name : ''].filter(Boolean).join(' · ');
-      pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || '작업')}</div>`;
+      pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || t('work_fallback'))}</div>`;
       pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkModal(m.id); });
       mapCanvas.appendChild(pin);
     });
@@ -1593,8 +2054,8 @@ const db = getFirestore(fbApp);
     companies.forEach(name=>{
       html += `<span><i class="dot" style="background:${companyColor(name)}"></i>${escapeHTML(name)}</span>`;
     });
-    html += `<span><i class="dot" style="background:var(--high)"></i>⚠ 고위험 포함</span>`;
-    html += `<span><i class="dot" style="background:var(--text-dim)"></i>등록된 위치(작업 없음)</span>`;
+    html += `<span><i class="dot" style="background:var(--high)"></i>⚠ ${t('legend_high')}</span>`;
+    html += `<span><i class="dot" style="background:var(--text-dim)"></i>${t('legend_empty_zone')}</span>`;
     legendEl.innerHTML = html;
   }
 
@@ -1605,21 +2066,21 @@ const db = getFirestore(fbApp);
   function openZoneDetail(zoneId){
     currentDetailZoneId = zoneId;
     const zone = zones.find(z=>z.id===zoneId);
-    $('zone-detail-title').textContent = '📍 ' + (zone ? zone.name : '위치');
+    $('zone-detail-title').textContent = '📍 ' + (zone ? zone.name : t('location_fallback'));
     const list = $('zone-detail-list');
     const worksHere = markers.filter(m=>m.zoneId===zoneId).sort((a,b)=>riskRank(a.risk)-riskRank(b.risk));
     list.innerHTML = '';
     if(worksHere.length === 0){
-      list.innerHTML = '<div class="zone-empty">이 위치에 오늘 등록된 작업이 없습니다.</div>';
+      list.innerHTML = `<div class="zone-empty">${t('zone_detail_empty')}</div>`;
     } else {
       worksHere.forEach(m=>{
         const card = document.createElement('div');
         card.className = 'work-card';
         card.dataset.risk = m.risk;
         card.innerHTML = `
-          <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span></span><span class="time">${m.time||''}</span></div>
-          <h4>${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
-          <div class="meta"><span>👷 ${m.people}명</span>${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}</div>`;
+          <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${statusLabelKo(m.status)}</span></span><span class="time">${m.time||''}</span></div>
+          <h4>${escapeHTML(m.workType||t('worktype_empty'))}</h4>
+          <div class="meta"><span>👷 ${m.people}${t('unit_people')}</span>${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}</div>`;
         card.addEventListener('click', ()=>{ zoneDetailBackdrop.classList.remove('show'); openWorkModal(m.id); });
         list.appendChild(card);
       });
@@ -1637,10 +2098,10 @@ const db = getFirestore(fbApp);
   function renderSidebar(){
     const list = $('sidebar-list');
     const highOnly = markers.filter(m=>m.risk==='high');
-    $('sidebar-count').textContent = highOnly.length + '건';
+    $('sidebar-count').textContent = highOnly.length + t('unit_cases');
     list.innerHTML = '';
     if(highOnly.length === 0){
-      list.innerHTML = `<div class="sidebar-empty">이 날짜에 등록된 고위험 작업이 없습니다.</div>`;
+      list.innerHTML = `<div class="sidebar-empty">${t('sidebar_empty')}</div>`;
       return;
     }
     const sorted = [...highOnly].sort((a,b)=> (a.time||'').localeCompare(b.time||''));
@@ -1650,11 +2111,11 @@ const db = getFirestore(fbApp);
       card.className = 'work-card';
       card.dataset.risk = m.risk;
       card.innerHTML = `
-        <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span></span><span class="time">${m.time||''}</span></div>
-        <h4>${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
+        <div class="work-card-top"><span class="badges-group"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span><span class="badge ${m.status==='done'?'done':'inprogress'}">${statusLabelKo(m.status)}</span></span><span class="time">${m.time||''}</span></div>
+        <h4>${escapeHTML(m.workType||t('worktype_empty'))}</h4>
         <div class="meta">
           ${zone ? `<span class="loc">📍 ${escapeHTML(zone.name)}</span>` : ''}
-          <span>👷 ${m.people}명</span>
+          <span>👷 ${m.people}${t('unit_people')}</span>
           ${m.company?`<span><i class="dot" style="background:${companyColor(m.company)};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;"></i>${escapeHTML(m.company)}</span>`:''}
           ${m.supervisor?`<span>🦺 ${escapeHTML(m.supervisor)}</span>`:''}
         </div>`;
@@ -1722,7 +2183,7 @@ const db = getFirestore(fbApp);
     sel.innerHTML = '';
     if(zones.length === 0){
       $('zone-hint').style.display = 'block';
-      sel.innerHTML = '<option value="">위치 없음</option>';
+      sel.innerHTML = `<option value="">${t('no_location_option')}</option>`;
       sel.disabled = true;
       return;
     }
@@ -1736,10 +2197,12 @@ const db = getFirestore(fbApp);
     });
   }
 
-  function openWorkModal(id, presetZoneId){
-    editingId = id;
-    const m = id ? markers.find(x=>x.id===id) : null;
-    $('modal-title').textContent = m ? '위험작업 수정' : '위험작업 등록';
+  function openWorkModal(id, presetZoneId, duplicateFrom){
+    // duplicateFrom: 다른 작업의 id. 지정하면 그 작업 내용을 그대로 불러오되
+    // "새 작업"으로 등록되도록 한다 (반복 입력 줄이기 - 복사해서 등록).
+    editingId = duplicateFrom ? null : id;
+    const m = duplicateFrom ? markers.find(x=>x.id===duplicateFrom) : (id ? markers.find(x=>x.id===id) : null);
+    $('modal-title').textContent = duplicateFrom ? '위험작업 등록 (복사됨)' : (m ? '위험작업 수정' : '위험작업 등록');
     populateZoneSelect(m ? m.zoneId : presetZoneId);
     $('f-worktype').value = m ? m.workType : '';
     $('f-people').value = m ? m.people : '';
@@ -1757,11 +2220,11 @@ const db = getFirestore(fbApp);
     $('f-note').value = m ? m.note : '';
     selectedRisk = m ? m.risk : 'high';
     updateRiskButtons();
-    workStatus = m ? (m.status || 'in_progress') : 'in_progress';
+    workStatus = (m && !duplicateFrom) ? (m.status || 'in_progress') : 'in_progress';
     updateStatusToggleBtn();
-    pendingArea = (m && m.area) ? m.area : null;
+    pendingArea = (m && m.area) ? { ...m.area } : null;
     updateAreaStatusText();
-    $('delete-btn').style.display = m ? 'block' : 'none';
+    $('delete-btn').style.display = (m && !duplicateFrom) ? 'block' : 'none';
     $('work-form-error').style.display = 'none';
     showWorkPage();
     setActiveTab('add-work');
@@ -1809,14 +2272,14 @@ const db = getFirestore(fbApp);
 
     const filtered = markers.filter(matches);
     if(filtered.length === 0){
-      list.innerHTML = '<div class="status-empty">조건에 맞는 작업이 없습니다.</div>';
+      list.innerHTML = `<div class="status-empty">${t('status_empty')}</div>`;
       return;
     }
 
     // group by company (works without a company go under "업체 미지정")
     const groups = new Map();
     filtered.forEach(m=>{
-      const key = m.company || '업체 미지정';
+      const key = m.company || t('company_unassigned');
       if(!groups.has(key)) groups.set(key, []);
       groups.get(key).push(m);
     });
@@ -1825,8 +2288,8 @@ const db = getFirestore(fbApp);
       works.sort((a,b)=> riskRank(a.risk)-riskRank(b.risk) || (a.time||'').localeCompare(b.time||''));
       const groupEl = document.createElement('div');
       groupEl.className = 'status-group';
-      const dotColor = companyName === '업체 미지정' ? '#9CA3AF' : companyColor(companyName);
-      groupEl.innerHTML = `<div class="status-group-head"><i class="dot" style="width:11px;height:11px;border-radius:50%;background:${dotColor};display:inline-block;"></i>${escapeHTML(companyName)}<span class="cnt">${works.length}건</span></div>`;
+      const dotColor = companyName === t('company_unassigned') ? '#9CA3AF' : companyColor(companyName);
+      groupEl.innerHTML = `<div class="status-group-head"><i class="dot" style="width:11px;height:11px;border-radius:50%;background:${dotColor};display:inline-block;"></i>${escapeHTML(companyName)}<span class="cnt">${works.length}${t('unit_cases')}</span></div>`;
       const cardsWrap = document.createElement('div');
       works.forEach(m=>{
         const zone = zones.find(z=>z.id===m.zoneId);
@@ -1837,16 +2300,26 @@ const db = getFirestore(fbApp);
         card.innerHTML = `
           <div class="v2-top">
             ${bulkSelectMode ? `<input type="checkbox" class="bulk-checkbox" ${isChecked?'checked':''}>` : ''}
-            <h4 class="v2-title">${escapeHTML(m.workType||'(작업명 미입력)')}</h4>
-            <span class="badge ${m.status==='done'?'done':'inprogress'}">${m.status==='done'?'완료':'진행중'}</span>
+            <h4 class="v2-title">${escapeHTML(m.workType||t('worktype_empty'))}</h4>
+            <span class="badge ${m.status==='done'?'done':'inprogress'}">${statusLabelKo(m.status)}</span>
           </div>
           <div class="v2-risk-row"><span class="badge ${m.risk}">${riskLabel(m.risk)}</span></div>
           <div class="v2-meta">
             ${zone ? `<div class="v2-meta-row">🏢 ${escapeHTML(zone.name)}</div>` : ''}
-            <div class="v2-meta-row">👤 ${m.people}명</div>
+            <div class="v2-meta-row">👤 ${m.people}${t('unit_people')}</div>
             ${m.time ? `<div class="v2-meta-row">🕐 ${escapeHTML(m.time)}</div>` : ''}
           </div>
-          ${m.supervisor ? `<div class="v2-supervisor">🦺 감시단/안전담당자: ${escapeHTML(m.supervisor)}</div>` : ''}`;
+          ${m.supervisor ? `<div class="v2-supervisor">🦺 ${t('supervisor_label')}: ${escapeHTML(m.supervisor)}</div>` : ''}
+          ${!bulkSelectMode ? `<button type="button" class="btn copy-work-btn">📋&nbsp; ${t('copy_work_btn')}</button>` : ''}`;
+        if(!bulkSelectMode){
+          const copyBtn = card.querySelector('.copy-work-btn');
+          if(copyBtn){
+            copyBtn.addEventListener('click', (ev)=>{
+              ev.stopPropagation();
+              openWorkModal(null, null, m.id);
+            });
+          }
+        }
         if(bulkSelectMode){
           card.classList.add('bulk-mode');
           if(bulkSelectedIds.has(m.id)) card.classList.add('bulk-selected');
@@ -1876,7 +2349,7 @@ const db = getFirestore(fbApp);
   }
 
   // ---------------- excel export (일간/주간/월간) ----------------
-  function statusLabelKo(s){ return s === 'done' ? '완료' : '진행중'; }
+  function statusLabelKo(s){ return s === 'done' ? t('status_done') : t('status_inprogress'); }
 
   async function fetchWorksInRange(startDate, endDate){
     const q = query(collection(db, 'works'), where('date', '>=', startDate), where('date', '<=', endDate));
@@ -1911,7 +2384,7 @@ const db = getFirestore(fbApp);
     const statusEl = $('export-status-text');
     statusEl.style.display = 'block';
     statusEl.style.color = '';
-    statusEl.textContent = '⏳ 데이터를 불러오는 중...';
+    statusEl.textContent = t('export_loading');
     try{
       const base = new Date(currentDate);
       let startDate, endDate, fileTag;
@@ -1936,7 +2409,7 @@ const db = getFirestore(fbApp);
       const works = await fetchWorksInRange(startDate, endDate);
       if(works.length === 0){
         statusEl.style.color = 'var(--high)';
-        statusEl.textContent = `⚠ ${startDate} ~ ${endDate} 기간에 등록된 작업이 없습니다.`;
+        statusEl.textContent = t('export_no_data')(startDate, endDate);
         return;
       }
 
@@ -1946,17 +2419,17 @@ const db = getFirestore(fbApp);
         {wch:11},{wch:14},{wch:24},{wch:8},{wch:6},{wch:13},{wch:16},{wch:18},{wch:8},{wch:30}
       ];
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, '작업목록');
+      XLSX.utils.book_append_sheet(wb, ws, t('export_sheet_name'));
 
       const siteLabel = (siteNameFromRemote || 'SafetyTop').replace(/[\\/:*?"<>|]/g, '');
       XLSX.writeFile(wb, `${siteLabel}_작업현황_${fileTag}.xlsx`);
 
       statusEl.style.color = 'var(--ok, #16a34a)';
-      statusEl.textContent = `✅ ${startDate} ~ ${endDate} 기간 ${works.length}건 내보내기 완료`;
+      statusEl.textContent = t('export_success')(startDate, endDate, works.length);
     }catch(err){
       console.error('excel export failed', err);
       statusEl.style.color = 'var(--high)';
-      statusEl.textContent = '⚠ 내보내기 중 오류가 발생했습니다.';
+      statusEl.textContent = t('export_error');
     }
   }
 
@@ -1993,7 +2466,7 @@ const db = getFirestore(fbApp);
     if(bulkSelectedIds.size === 0) return;
     const ids = [...bulkSelectedIds];
     if(bulkMode === 'delete'){
-      const ok = confirm(`선택한 작업 ${ids.length}건을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.`);
+      const ok = confirm(t('bulk_delete_confirm')(ids.length));
       if(!ok) return;
       try{
         await Promise.all(ids.map(id => deleteDoc(doc(db,'works',id))));
@@ -2011,15 +2484,15 @@ const db = getFirestore(fbApp);
   function updateBulkBar(){
     const bar = $('bulk-bar');
     bar.style.display = bulkSelectMode ? 'flex' : 'none';
-    $('bulk-count').textContent = bulkSelectedIds.size + '건 선택됨';
+    $('bulk-count').textContent = bulkSelectedIds.size + t('bulk_count_suffix');
     const actionBtn = $('bulk-action-btn');
     actionBtn.disabled = bulkSelectedIds.size === 0;
     if(bulkMode === 'delete'){
-      actionBtn.textContent = '삭제';
+      actionBtn.textContent = t('delete_btn');
       actionBtn.classList.remove('primary');
       actionBtn.classList.add('danger');
     } else {
-      actionBtn.textContent = '완료 처리';
+      actionBtn.textContent = t('bulk_complete_action');
       actionBtn.classList.remove('danger');
       actionBtn.classList.add('primary');
     }
@@ -2039,10 +2512,10 @@ const db = getFirestore(fbApp);
   function updateStatusToggleBtn(){
     const btn = $('status-toggle-btn');
     if(workStatus === 'done'){
-      btn.textContent = '✅ 완료';
+      btn.textContent = '✅ ' + t('status_done');
       btn.classList.add('status-done');
     } else {
-      btn.textContent = '🔵 진행중';
+      btn.textContent = '🔵 ' + t('status_inprogress');
       btn.classList.remove('status-done');
     }
   }
@@ -2136,6 +2609,7 @@ const db = getFirestore(fbApp);
   setInterval(loadWeather, 30 * 60 * 1000); // refresh every 30 min
 
   setAdminUI();
+  applyI18n();
   init();
 })();
 </script>
