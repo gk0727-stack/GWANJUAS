@@ -475,9 +475,15 @@
   .upload-status.error{ border-color:var(--high); color:var(--high); }
 
   @media (max-width:820px){
-    .main{ flex-direction:column; }
-    .sidebar{ max-width:none; flex:1 1 32%; border-left:none; border-right:none; border-top:1px solid var(--border); order:0; }
-    .map-wrap{ flex:1 1 63%; min-height:340px; }
+    .main{ flex-direction:column; height:auto; overflow:visible; }
+    .sidebar{ max-width:none; flex:1 1 auto; min-height:220px; border-left:none; border-right:none; border-top:1px solid var(--border); order:0; }
+    .map-wrap{ flex:0 0 auto; min-height:0; overflow:visible; }
+    .map-viewport{ flex:0 0 auto; height:44vh; min-height:300px; }
+    .legend{
+      max-height:none; overflow-y:visible;
+      font-size:12px; font-weight:600; gap:9px; padding:8px 12px;
+    }
+    .legend .dot{ width:9px; height:9px; }
   }
 </style>
 </head>
