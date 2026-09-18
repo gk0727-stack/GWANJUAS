@@ -112,6 +112,14 @@
   }
   .date-nav button:hover{ background:var(--border); color:var(--text); }
   .date-nav input[type=date]{ background:none; border:none; color:var(--text); font-size:16px; padding:4px 6px; color-scheme:light; }
+  .status-date-nav{
+    margin-bottom:16px; justify-content:space-between;
+  }
+  .status-date-nav input[type=date]{ flex:1; text-align:center; }
+  .status-date-today-btn{
+    width:auto !important; padding:0 12px !important; font-size:13.5px !important; font-weight:700;
+    color:var(--accent) !important;
+  }
   .btn{
     border:1.5px solid var(--border); background:var(--panel); color:var(--text);
     padding:10px 16px; border-radius:10px; font-size:15px; font-weight:600;
@@ -670,6 +678,13 @@
         <h2 data-i18n="status_title">작업현황</h2>
       </div>
 
+      <div class="date-nav status-date-nav" id="status-date-nav">
+        <button id="status-prev-day" type="button" title="이전 날짜" data-i18n-title="prev_day_title">‹</button>
+        <input type="date" id="status-date-picker">
+        <button id="status-next-day" type="button" title="다음 날짜" data-i18n-title="next_day_title">›</button>
+        <button id="status-date-today" type="button" class="status-date-today-btn" data-i18n="today_btn">오늘</button>
+      </div>
+
       <div class="export-row">
         <span class="export-label" data-i18n="export_label">📥 엑셀 내보내기</span>
         <button class="btn export-btn" id="export-daily-btn" type="button" data-i18n="export_daily">일간</button>
@@ -961,6 +976,9 @@ const db = getFirestore(fbApp);
       delete_btn: "삭제",
       save_btn: "저장",
       status_title: "작업현황",
+      prev_day_title: "이전 날짜",
+      next_day_title: "다음 날짜",
+      today_btn: "오늘",
       export_label: "📥 엑셀 내보내기",
       export_daily: "일간",
       export_weekly: "주간",
@@ -1108,6 +1126,9 @@ const db = getFirestore(fbApp);
       delete_btn: "删除",
       save_btn: "保存",
       status_title: "作业现况",
+      prev_day_title: "前一天",
+      next_day_title: "后一天",
+      today_btn: "今天",
       export_label: "📥 导出Excel",
       export_daily: "日",
       export_weekly: "周",
@@ -1255,6 +1276,9 @@ const db = getFirestore(fbApp);
       delete_btn: "Delete",
       save_btn: "Save",
       status_title: "Work status",
+      prev_day_title: "Previous day",
+      next_day_title: "Next day",
+      today_btn: "Today",
       export_label: "📥 Export to Excel",
       export_daily: "Daily",
       export_weekly: "Weekly",
@@ -1726,6 +1750,12 @@ const db = getFirestore(fbApp);
       renderSidebar();
       renderFullWorkList();
       renderStats();
+      // 작업현황 화면에 날짜 이동 기능을 추가하면서, 날짜를 바꿔서 새로
+      // 작업 목록을 구독해 받아올 때 그 화면이 실제로 다시 그려지지 않던
+      // 문제를 같이 고쳤다(이전에는 여기서 renderStatusList()를 호출하지
+      // 않아서, 작업현황 화면을 보고 있는 도중 날짜를 바꾸면 목록이 그대로
+      // 멈춰 있었음).
+      renderStatusList();
       hideAppLoadingOverlay();
       autoCompleteExpiredWorks();
     }, (err)=>{ console.error('works listen error', err); hideAppLoadingOverlay(); });
@@ -1771,18 +1801,33 @@ const db = getFirestore(fbApp);
   });
 
   // ---------------- date navigation ----------------
-  datePicker.addEventListener('change', ()=>{
-    currentDate = datePicker.value || todayStr();
+  // 대시보드 상단의 날짜 선택과 작업현황 화면 안의 날짜 선택은 같은
+  // currentDate 하나를 공유한다(작업 목록 자체가 날짜별로 다시 구독되는
+  // 구조라서). 그래서 어느 쪽에서 날짜를 바꾸든 항상 이 함수 하나를 거쳐서
+  // currentDate 갱신 + 양쪽 입력창 동기화 + 재구독까지 한 번에 처리한다.
+  const statusDatePicker = $('status-date-picker');
+  function setCurrentDate(newDate){
+    currentDate = newDate || todayStr();
+    datePicker.value = currentDate;
+    if(statusDatePicker) statusDatePicker.value = currentDate;
     subscribeWorks(currentDate);
-  });
-  $('prev-day').addEventListener('click', ()=>{
-    const d = new Date(currentDate); d.setDate(d.getDate()-1);
-    currentDate = toISO(d); datePicker.value = currentDate; subscribeWorks(currentDate);
-  });
-  $('next-day').addEventListener('click', ()=>{
-    const d = new Date(currentDate); d.setDate(d.getDate()+1);
-    currentDate = toISO(d); datePicker.value = currentDate; subscribeWorks(currentDate);
-  });
+  }
+  function shiftCurrentDate(deltaDays){
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + deltaDays);
+    setCurrentDate(toISO(d));
+  }
+  datePicker.addEventListener('change', ()=> setCurrentDate(datePicker.value));
+  $('prev-day').addEventListener('click', ()=> shiftCurrentDate(-1));
+  $('next-day').addEventListener('click', ()=> shiftCurrentDate(1));
+
+  if(statusDatePicker){
+    statusDatePicker.value = currentDate;
+    statusDatePicker.addEventListener('change', ()=> setCurrentDate(statusDatePicker.value));
+  }
+  $('status-prev-day').addEventListener('click', ()=> shiftCurrentDate(-1));
+  $('status-next-day').addEventListener('click', ()=> shiftCurrentDate(1));
+  $('status-date-today').addEventListener('click', ()=> setCurrentDate(todayStr()));
 
   // ---------------- image upload ----------------
   $('empty-upload-btn').addEventListener('click', ()=> requireAdmin(()=>fileInput.click()));
