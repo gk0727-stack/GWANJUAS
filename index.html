@@ -444,7 +444,8 @@
     gap:4px; padding:12px 0 13px; background:none; border:none; color:var(--text-muted);
     font-size:13px; font-weight:600;
   }
-  .tab-btn .tab-icon{ font-size:26px; line-height:1; }
+  .tab-btn .tab-icon{ font-size:26px; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .tab-btn .tab-icon svg{ width:24px; height:24px; display:block; }
   .tab-btn:hover{ background:var(--panel-2); }
   .tab-btn.active{ color:var(--accent); }
 
@@ -720,13 +721,13 @@
 
   <div class="bottom-tabbar">
     <button class="tab-btn active" id="tab-dashboard">
-      <span class="tab-icon">🏗️</span><span data-i18n="tab_dashboard">대시보드</span>
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/><path d="M9 9h.01M12 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg></span><span data-i18n="tab_dashboard">대시보드</span>
     </button>
     <button class="tab-btn" id="tab-add-work">
-      <span class="tab-icon">✏️</span><span data-i18n="tab_add_work">작업등록</span>
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span data-i18n="tab_add_work">작업등록</span>
     </button>
     <button class="tab-btn" id="tab-status">
-      <span class="tab-icon">📋</span><span data-i18n="tab_status">작업현황</span>
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8 11h8M8 15h8M8 19h5"/></svg></span><span data-i18n="tab_status">작업현황</span>
     </button>
   </div>
 </div>
@@ -2713,7 +2714,14 @@ const db = getFirestore(fbApp);
     workPage.style.display = 'none';
     statusPage.style.display = 'none';
     staffPage.style.display = 'none';
-    mainArea.style.display = 'flex';
+    // .main 은 CSS에서 항상 display:grid 로 제어된다(데스크톱/모바일 각각
+    // grid-template-areas가 다름). 예전에는 flex 레이아웃이어서 여기서
+    // 'flex'로 되돌렸었는데, Grid로 바꾼 뒤에도 이 줄이 안 바뀌어서
+    // 인라인 style="display:flex"가 CSS의 display:grid 규칙을 덮어써버려
+    // 작업등록/작업현황 화면을 갔다가 대시보드로 돌아오면 그리드 배치가
+    // 통째로 깨졌었다(사진/범례/통계/목록이 뒤죽박죽). 인라인 스타일을
+    // 아예 지워서 CSS가 다시 제어하게 한다.
+    mainArea.style.display = '';
   }
   function showWorkPage(){ closeAllPages(); mainArea.style.display = 'none'; workPage.style.display = 'block'; }
   function hideWorkPage(){ closeAllPages(); }
