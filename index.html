@@ -719,17 +719,27 @@
     </div>
   </div>
 
-  <div class="bottom-tabbar">
-    <button class="tab-btn active" id="tab-dashboard">
-      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/><path d="M9 9h.01M12 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg></span><span data-i18n="tab_dashboard">대시보드</span>
-    </button>
-    <button class="tab-btn" id="tab-add-work">
-      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span data-i18n="tab_add_work">작업등록</span>
-    </button>
-    <button class="tab-btn" id="tab-status">
-      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8 11h8M8 15h8M8 19h5"/></svg></span><span data-i18n="tab_status">작업현황</span>
-    </button>
-  </div>
+</div>
+
+<!-- 하단 탭바는 일부러 .dashboard-viewport(스크롤되는 컨테이너) 밖으로 뺐다.
+     예전에는 overflow-y:auto 로 스크롤되는 .dashboard-viewport 안에
+     position:fixed 탭바가 들어있었는데, 이런 구조는 모바일 브라우저(특히
+     iOS Safari, 일부 안드로이드 웹뷰)에서 스크롤 가능한 컨테이너 "안"에
+     있는 fixed 요소가 스크롤 중/스크롤 후에 사라지거나 깜빡이는 아주 유명한
+     버그를 유발한다. 대시보드는 사진+작업목록으로 스크롤할 내용이 많아서
+     이 버그가 자주 보이고, 작업등록/작업현황 화면은 상대적으로 짧아서 덜
+     보였던 것으로 이 부분이 원인으로 지목된다. 탭바를 스크롤 컨테이너의
+     완전히 바깥(형제 요소)으로 옮기면 이 문제 자체가 구조적으로 생길 수 없다. -->
+<div class="bottom-tabbar">
+  <button class="tab-btn active" id="tab-dashboard">
+    <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/><path d="M9 9h.01M12 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg></span><span data-i18n="tab_dashboard">대시보드</span>
+  </button>
+  <button class="tab-btn" id="tab-add-work">
+    <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span data-i18n="tab_add_work">작업등록</span>
+  </button>
+  <button class="tab-btn" id="tab-status">
+    <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8 11h8M8 15h8M8 19h5"/></svg></span><span data-i18n="tab_status">작업현황</span>
+  </button>
 </div>
 
 <!-- Zone naming modal (after placing on map) -->
