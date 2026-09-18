@@ -477,13 +477,11 @@
       grid-template-areas:"map" "legend" "stats" "sidebar";
       height:auto;
     }
-    .map-wrap{ min-height:0; overflow:visible; }
+    .map-wrap{ min-height:0; overflow:hidden; }
     .map-viewport{
-      flex:0 0 auto; height:auto;
-      aspect-ratio:var(--map-aspect, 4 / 3);
-      min-height:220px; max-height:60vh;
+      flex:0 0 auto; height:40vh; min-height:260px; max-height:420px;
     }
-    .map-canvas img{ object-fit:contain; background:#0b1220; }
+    .map-canvas img{ object-fit:contain; background:#11181f; }
     .legend{
       max-height:none; overflow-y:visible;
       font-size:12px; font-weight:600; gap:9px; padding:8px 12px;
@@ -1866,11 +1864,6 @@ const db = getFirestore(fbApp);
       mapCanvas.insertBefore(imgEl, mapCanvas.firstChild);
       imgEl.addEventListener('click', onMapClick);
       imgEl.addEventListener('pointerdown', onAreaPointerDown);
-      imgEl.addEventListener('load', ()=>{
-        if(imgEl.naturalWidth && imgEl.naturalHeight){
-          document.documentElement.style.setProperty('--map-aspect', imgEl.naturalWidth + ' / ' + imgEl.naturalHeight);
-        }
-      });
     }
     imgEl.src = mapImageURL;
   }
