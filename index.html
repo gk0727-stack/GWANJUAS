@@ -707,6 +707,12 @@
         <button class="btn" id="bulk-select-toggle" style="flex:1;" data-i18n="bulk_complete_toggle">☑️&nbsp; 일괄 작업 완료</button>
         <button class="btn danger" id="bulk-delete-toggle" style="flex:1;" data-i18n="bulk_delete_toggle">🗑️&nbsp; 일괄 삭제</button>
       </div>
+      <!-- 하루 마감: 지금 보고 있는 날짜의 "진행중" 작업을 전부 한 번에 "완료"로 바꾼다.
+           일괄 작업 완료(위)는 하나씩 체크해야 하지만, 이건 확인 한 번으로 그 날짜 전체를 마감한다. -->
+      <div class="field-row admin-only" id="dayclose-row" style="display:none; margin-bottom:14px;">
+        <button class="btn primary" id="dayclose-btn" style="width:100%; justify-content:center;" data-i18n="dayclose_btn">🌙&nbsp; 하루 마감</button>
+      </div>
+      <div class="hint-text" id="dayclose-status-text" style="display:none;"></div>
 
       <div class="bulk-bar" id="bulk-bar" style="display:none;">
         <span id="bulk-count">0건 선택됨</span>
@@ -862,10 +868,33 @@
       <button class="btn" id="mp-manage-zones" data-i18n="mp_manage_zones">📍&nbsp; 위치(구역) 관리</button>
       <button class="btn" id="mp-manage-staff" data-i18n="mp_manage_staff">👷&nbsp; 담당자 관리</button>
       <button class="btn" id="mp-excel-import" data-i18n="mp_excel_import">📊&nbsp; 엑셀로 작업 일괄 등록</button>
+      <button class="btn" id="mp-merge-companies" data-i18n="mp_merge_companies">🔗&nbsp; 업체명 병합</button>
       <button class="btn danger" id="mp-admin-off" data-i18n="mp_admin_off">🔓&nbsp; 관리자 모드 끄기</button>
     </div>
     <input type="file" id="excel-input" accept=".xlsx,.xls" style="display:none;">
     <div class="hint-text" id="excel-import-status" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- 업체명 병합 modal: 오타/표기 차이로 나뉜 업체명을 하나로 합친다 (모든 날짜의 작업 기록 대상, 되돌릴 수 없음) -->
+<div class="modal-backdrop" id="company-merge-backdrop">
+  <div class="modal" style="max-width:340px;">
+    <button class="btn modal-close-x" id="company-merge-close">✕</button>
+    <h3 data-i18n="merge_title">🔗 업체명 병합</h3>
+    <div class="hint-text" data-i18n="merge_desc">오타나 표기 차이로 따로 등록된 업체명을 하나로 합칩니다. 모든 날짜의 작업 기록에 적용되며, 되돌릴 수 없습니다.</div>
+    <div class="field">
+      <label data-i18n="merge_from_label">병합할 업체명 (없어질 이름)</label>
+      <input type="text" id="merge-from-input" list="merge-company-datalist" placeholder="예: 안산 조경" data-i18n-placeholder="merge_from_ph" autocomplete="off">
+    </div>
+    <div class="field">
+      <label data-i18n="merge_to_label">합쳐질 업체명 (남을 이름)</label>
+      <input type="text" id="merge-to-input" list="merge-company-datalist" placeholder="예: 안산조경" data-i18n-placeholder="merge_to_ph" autocomplete="off">
+    </div>
+    <datalist id="merge-company-datalist"></datalist>
+    <div class="hint-text" id="merge-status-text" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn danger" id="merge-execute-btn" style="width:100%;" data-i18n="merge_execute_btn">병합 실행</button>
+    </div>
   </div>
 </div>
 
@@ -1016,9 +1045,31 @@ const db = getFirestore(fbApp);
       mp_manage_zones: "📍  위치(구역) 관리",
       mp_manage_staff: "👷  담당자 관리",
       mp_excel_import: "📊  엑셀로 작업 일괄 등록",
+            mp_merge_companies: "🔗  업체명 병합",
       mp_admin_off: "🔓  관리자 모드 끄기",
       status_done: "완료",
       status_inprogress: "진행중",
+      merge_title: "🔗 업체명 병합",
+      merge_desc: "오타나 표기 차이로 따로 등록된 업체명을 하나로 합칩니다. 모든 날짜의 작업 기록에 적용되며, 되돌릴 수 없습니다.",
+      merge_from_label: "병합할 업체명 (없어질 이름)",
+      merge_from_ph: "예: 안산 조경",
+      merge_to_label: "합쳐질 업체명 (남을 이름)",
+      merge_to_ph: "예: 안산조경",
+      merge_execute_btn: "병합 실행",
+      merge_need_both: "두 업체명을 모두 입력해주세요.",
+      merge_same_name: "같은 이름은 병합할 수 없습니다.",
+      merge_loading: "⏳ 업체 목록을 불러오는 중...",
+      merge_not_found: (name)=>`"${name}" 업체의 작업 기록을 찾을 수 없습니다.`,
+      merge_confirm: (from,to,count)=>`"${from}" (${count}건)을 "${to}"(으)로 병합합니다.\n이 작업은 되돌릴 수 없습니다. 계속할까요?`,
+      merge_running: (count)=>`⏳ ${count}건 병합 중...`,
+      merge_success: (count)=>`✅ ${count}건이 병합되었습니다.`,
+      merge_error: "병합 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      dayclose_btn: "🌙  하루 마감",
+      dayclose_confirm: (count,date)=>`${date} 날짜의 진행중인 작업 ${count}건을 모두 완료 처리합니다.\n계속할까요?`,
+      dayclose_none: "진행중인 작업이 없습니다.",
+      dayclose_running: (count)=>`⏳ ${count}건 완료 처리 중...`,
+      dayclose_success: (count)=>`✅ ${count}건을 완료 처리했습니다.`,
+      dayclose_error: "하루 마감 처리 중 오류가 발생했습니다.",
       area_set_msg: (count) => count > 1 ? `범위 ${count}개가 지정되었습니다.` : "범위가 지정되었습니다.",
       area_clear_link: "전체 지우기",
       area_redraw_btn: "🗺️ 범위 다시 그리기",
@@ -1166,9 +1217,31 @@ const db = getFirestore(fbApp);
       mp_manage_zones: "📍  位置（区域）管理",
       mp_manage_staff: "👷  负责人管理",
       mp_excel_import: "📊  通过Excel批量登记作业",
+            mp_merge_companies: "🔗  合并公司名称",
       mp_admin_off: "🔓  关闭管理员模式",
       status_done: "已完成",
       status_inprogress: "进行中",
+      merge_title: "🔗 合并公司名称",
+      merge_desc: "将因拼写或表述差异而分开登记的公司名称合并为一个。适用于所有日期的作业记录,且无法撤销。",
+      merge_from_label: "要合并的公司名(将被删除)",
+      merge_from_ph: "例: 安山造景",
+      merge_to_label: "合并后保留的公司名",
+      merge_to_ph: "例: 安山造景",
+      merge_execute_btn: "执行合并",
+      merge_need_both: "请输入两个公司名称。",
+      merge_same_name: "不能合并相同的名称。",
+      merge_loading: "⏳ 正在加载公司列表...",
+      merge_not_found: (name)=>`找不到"${name}"公司的作业记录。`,
+      merge_confirm: (from,to,count)=>`将"${from}"(${count}件)合并为"${to}"。\n此操作无法撤销,是否继续?`,
+      merge_running: (count)=>`⏳ 正在合并${count}件...`,
+      merge_success: (count)=>`✅ 已合并${count}件。`,
+      merge_error: "合并过程中发生错误,请稍后再试。",
+      dayclose_btn: "🌙  结束当日",
+      dayclose_confirm: (count,date)=>`将${date}的${count}件进行中作业全部标记为完成。\n是否继续?`,
+      dayclose_none: "没有进行中的作业。",
+      dayclose_running: (count)=>`⏳ 正在处理${count}件...`,
+      dayclose_success: (count)=>`✅ 已完成处理${count}件。`,
+      dayclose_error: "结束当日处理过程中发生错误。",
       area_set_msg: (count) => count > 1 ? `已设置 ${count} 个作业范围。` : "已设置作业范围。",
       area_clear_link: "全部清除",
       area_redraw_btn: "🗺️ 重新绘制范围",
@@ -1316,9 +1389,31 @@ const db = getFirestore(fbApp);
       mp_manage_zones: "📍  Manage locations",
       mp_manage_staff: "👷  Manage staff",
       mp_excel_import: "📊  Bulk register work from Excel",
+            mp_merge_companies: "🔗  Merge company names",
       mp_admin_off: "🔓  Turn off admin mode",
       status_done: "Done",
       status_inprogress: "In progress",
+      merge_title: "🔗 Merge company names",
+      merge_desc: "Merge company names that were registered separately due to typos or spelling differences. Applies to work records on all dates and cannot be undone.",
+      merge_from_label: "Company name to merge (will be removed)",
+      merge_from_ph: "e.g. Ansan Landscap",
+      merge_to_label: "Company name to keep",
+      merge_to_ph: "e.g. Ansan Landscape",
+      merge_execute_btn: "Merge",
+      merge_need_both: "Please enter both company names.",
+      merge_same_name: "Cannot merge a name with itself.",
+      merge_loading: "⏳ Loading company list...",
+      merge_not_found: (name)=>`No work records found for "${name}".`,
+      merge_confirm: (from,to,count)=>`Merge "${from}" (${count} records) into "${to}".\nThis cannot be undone. Continue?`,
+      merge_running: (count)=>`⏳ Merging ${count} records...`,
+      merge_success: (count)=>`✅ Merged ${count} records.`,
+      merge_error: "An error occurred while merging. Please try again.",
+      dayclose_btn: "🌙  Close out day",
+      dayclose_confirm: (count,date)=>`Mark all ${count} in-progress work items on ${date} as done.\nContinue?`,
+      dayclose_none: "There are no in-progress work items.",
+      dayclose_running: (count)=>`⏳ Completing ${count} items...`,
+      dayclose_success: (count)=>`✅ Completed ${count} items.`,
+      dayclose_error: "An error occurred while closing out the day.",
       area_set_msg: (count) => count > 1 ? `${count} areas have been set.` : "Area has been set.",
       area_clear_link: "Clear all",
       area_redraw_btn: "🗺️ Redraw area",
@@ -1529,6 +1624,103 @@ const db = getFirestore(fbApp);
   $('mp-manage-zones').addEventListener('click', ()=>{ managePanelBackdrop.classList.remove('show'); openZoneManageModal(); });
   $('mp-manage-staff').addEventListener('click', ()=>{ managePanelBackdrop.classList.remove('show'); openStaffPage(); });
   $('mp-excel-import').addEventListener('click', ()=>{ $('excel-import-status').style.display='none'; $('excel-input').value=''; $('excel-input').click(); });
+
+  // ---------------- 업체명 병합 (관리자 전용, 모든 날짜의 작업 기록 대상) ----------------
+  const companyMergeBackdrop = $('company-merge-backdrop');
+  const mergeFromInput = $('merge-from-input');
+  const mergeToInput = $('merge-to-input');
+  const mergeStatusText = $('merge-status-text');
+
+  function showMergeStatus(msg, isError){
+    mergeStatusText.style.display = 'block';
+    mergeStatusText.style.color = isError ? 'var(--high)' : '';
+    mergeStatusText.textContent = msg;
+  }
+
+  // silent=true 일 때는 상태 메시지를 건드리지 않는다(예: 병합 성공 직후
+  // 목록만 새로고침하는 경우, "✅ N건 병합됨" 메시지가 "불러오는 중..."으로
+  // 바로 덮어써지지 않게 하기 위함).
+  async function populateMergeCompanyDatalist(silent){
+    const datalist = $('merge-company-datalist');
+    datalist.innerHTML = '';
+    if(!silent) showMergeStatus(t('merge_loading'), false);
+    try{
+      // 오늘 보고 있는 날짜뿐 아니라 전체 작업 기록에서 업체명을 모아야
+      // 과거 날짜에만 등장했던 오타 업체명도 병합 대상으로 잡을 수 있다.
+      const snap = await getDocs(collection(db, 'works'));
+      const names = new Set();
+      snap.forEach(d=>{
+        const company = (d.data().company || '').trim();
+        if(company) names.add(company);
+      });
+      [...names].sort((a,b)=>a.localeCompare(b, 'ko')).forEach(name=>{
+        const opt = document.createElement('option');
+        opt.value = name;
+        datalist.appendChild(opt);
+      });
+      if(!silent) mergeStatusText.style.display = 'none';
+    }catch(e){
+      console.error('load company list failed', e);
+      if(!silent) showMergeStatus(t('merge_error'), true);
+    }
+  }
+
+  $('mp-merge-companies').addEventListener('click', ()=>{
+    managePanelBackdrop.classList.remove('show');
+    mergeFromInput.value = '';
+    mergeToInput.value = '';
+    mergeStatusText.style.display = 'none';
+    companyMergeBackdrop.classList.add('show');
+    populateMergeCompanyDatalist();
+  });
+  $('company-merge-close').addEventListener('click', ()=> companyMergeBackdrop.classList.remove('show'));
+  companyMergeBackdrop.addEventListener('click', (e)=>{ if(e.target===companyMergeBackdrop) companyMergeBackdrop.classList.remove('show'); });
+
+  $('merge-execute-btn').addEventListener('click', async ()=>{
+    const fromName = mergeFromInput.value.trim();
+    const toName = mergeToInput.value.trim();
+    if(!fromName || !toName){ showMergeStatus(t('merge_need_both'), true); return; }
+    if(fromName === toName){ showMergeStatus(t('merge_same_name'), true); return; }
+
+    showMergeStatus(t('merge_loading'), false);
+    let matchSnap;
+    try{
+      matchSnap = await getDocs(query(collection(db, 'works'), where('company', '==', fromName)));
+    }catch(e){
+      console.error('merge lookup failed', e);
+      showMergeStatus(t('merge_error'), true);
+      return;
+    }
+    const ids = matchSnap.docs.map(d=>d.id);
+    if(ids.length === 0){ showMergeStatus(t('merge_not_found')(fromName), true); return; }
+
+    const ok = confirm(t('merge_confirm')(fromName, toName, ids.length));
+    if(!ok){ mergeStatusText.style.display = 'none'; return; }
+
+    showMergeStatus(t('merge_running')(ids.length), false);
+    try{
+      await Promise.all(ids.map(id => updateDoc(doc(db, 'works', id), { company: toName })));
+      // 하루 마감과 같은 이유로, 오늘(현재 보고 있는 날짜)의 markers 중에
+      // 이번에 병합된 항목이 있다면 리스너를 기다리지 않고 바로 업체명을
+      // 바꿔서 아래 렌더가 즉시 새 이름/색으로 보이게 한다.
+      const idSet = new Set(ids);
+      markers.forEach(m => { if(idSet.has(m.id)) m.company = toName; });
+      showMergeStatus(t('merge_success')(ids.length), false);
+      mergeFromInput.value = '';
+      mergeToInput.value = '';
+      populateMergeCompanyDatalist(true);
+      // 오늘(현재 보고 있는 날짜)의 작업 중에도 병합 대상이 있었을 수 있으니
+      // 지도 핀/범례/통계/작업목록을 전부 다시 그려서 바로 반영한다.
+      renderAllPins();
+      renderSidebar();
+      renderFullWorkList();
+      renderStats();
+      renderStatusList();
+    }catch(e){
+      console.error('merge failed', e);
+      showMergeStatus(t('merge_error'), true);
+    }
+  });
 
   // ---------------- excel bulk import (점검대상=T 행만, 위험도/업체/작업내용만 매핑) ----------------
   const RISK_GRADE_MAP = { '상':'high', '중':'mid', '하':'low' };
@@ -3109,6 +3301,42 @@ const db = getFirestore(fbApp);
       actionBtn.classList.add('primary');
     }
   }
+
+  // ---------------- 하루 마감 (관리자 전용): 지금 보는 날짜의 "진행중" 작업을 한 번에 "완료"로 ----------------
+  const daycloseStatusText = $('dayclose-status-text');
+  function showDaycloseStatus(msg, isError){
+    daycloseStatusText.style.display = 'block';
+    daycloseStatusText.style.color = isError ? 'var(--high)' : '';
+    daycloseStatusText.textContent = msg;
+  }
+  $('dayclose-btn').addEventListener('click', async ()=>{
+    const inProgress = markers.filter(m=>m.status !== 'done');
+    if(inProgress.length === 0){ showDaycloseStatus(t('dayclose_none'), false); return; }
+
+    const ok = confirm(t('dayclose_confirm')(inProgress.length, currentDate));
+    if(!ok) return;
+
+    showDaycloseStatus(t('dayclose_running')(inProgress.length), false);
+    try{
+      await Promise.all(inProgress.map(m => updateDoc(doc(db, 'works', m.id), { status: 'done' })));
+      // Firestore의 실시간 리스너(onSnapshot)가 이 쓰기를 반영해서 markers를
+      // 다시 채워줄 때까지 기다리지 않고, 방금 완료 처리한 항목들의 상태를
+      // 로컬 markers 배열에도 바로 바꿔둔다 — 그래야 아래 렌더 함수들이
+      // 곧바로 "완료" 배지를 보여준다(리스너가 아주 살짝 늦게 들어와도
+      // 화면이 잠깐 안 바뀐 것처럼 보이는 일이 없게).
+      inProgress.forEach(m => { m.status = 'done'; });
+      showDaycloseStatus(t('dayclose_success')(inProgress.length), false);
+      // bulkSelectMode의 완료 처리와 동일하게, 마감 후 선택 상태를 초기화하고
+      // 화면을 새로 그려서 "완료" 배지가 바로 반영되게 한다.
+      bulkSelectMode = false;
+      bulkSelectedIds.clear();
+      updateBulkBar();
+      renderStatusList();
+    }catch(e){
+      console.error('day close failed', e);
+      showDaycloseStatus(t('dayclose_error'), true);
+    }
+  });
 
   document.querySelectorAll('.risk-choice button').forEach(btn=>{
     btn.addEventListener('click', ()=>{ selectedRisk = btn.dataset.risk; updateRiskButtons(); });
