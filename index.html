@@ -325,6 +325,11 @@
     cursor:pointer; padding:0 5px; line-height:1;
   }
   .area-chip-remove:hover{ color:var(--high); }
+  .worktype-suggest-btn{
+    background:var(--accent-bg); border:1px solid transparent; border-radius:14px;
+    padding:5px 12px; font-size:13px; font-weight:600; color:var(--accent);
+  }
+  .worktype-suggest-btn:hover{ border-color:var(--accent); }
   .wd-map-wrap{
     position:relative; width:100%; border-radius:10px; overflow:hidden;
     background:var(--panel-2); border:1px solid var(--border); line-height:0;
@@ -445,6 +450,7 @@
     display:flex; align-items:center; justify-content:center; padding:0 5px;
     border:2.5px solid #fff; box-shadow:0 1px 3px rgba(16,24,40,0.3);
   }
+  .pin-warn.pin-done-badge{ background:var(--low); }
 
   @media (max-width:960px){
     .stats{ grid-template-columns:repeat(3,1fr); }
@@ -576,6 +582,7 @@
         <label><span data-i18n="label_worktype">작업 내용</span> <span class="req-mark">*</span></label>
         <input type="text" id="f-worktype" placeholder="예: 3층 외벽 비계 설치" data-i18n-placeholder="worktype_ph" list="worktype-datalist" autocomplete="off">
         <datalist id="worktype-datalist"></datalist>
+        <div id="worktype-suggest" style="display:none; margin-top:9px;"></div>
       </div>
 
       <div class="field">
@@ -602,8 +609,8 @@
         <div class="field"><label data-i18n="label_people">투입 인원</label><input type="number" id="f-people" min="1" placeholder="0"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label data-i18n="label_time_start">시작 시간</label><input type="time" id="f-time-start"></div>
-        <div class="field"><label data-i18n="label_time_end">종료 시간</label><input type="time" id="f-time-end"></div>
+        <div class="field"><label data-i18n="label_time_start">시작 시간</label><input type="text" id="f-time-start" inputmode="numeric" placeholder="09:00" maxlength="5" autocomplete="off"></div>
+        <div class="field"><label data-i18n="label_time_end">종료 시간</label><input type="text" id="f-time-end" inputmode="numeric" placeholder="18:00" maxlength="5" autocomplete="off"></div>
       </div>
 
       <div class="field"><label data-i18n="label_company">업체 / 팀명</label><input type="text" id="f-company" placeholder="예: OO건설 철골팀" data-i18n-placeholder="company_ph" list="company-datalist" autocomplete="off"><datalist id="company-datalist"></datalist></div>
@@ -1003,7 +1010,9 @@ const db = getFirestore(fbApp);
       wd_reopen_btn: "🔵 진행중으로 변경",
       wd_edit_link: "수정하기",
       wd_map_label: "지도 위 작업범위",
-      app_loading_text: "불러오는 중..."
+      app_loading_text: "불러오는 중...",
+      worktype_suggest_label: "이 위치의 다른 작업에서 불러오기",
+      zone_select_placeholder: "위치를 선택하세요"
     },
     zh: {
       manage_title: "管理",
@@ -1145,7 +1154,9 @@ const db = getFirestore(fbApp);
       wd_reopen_btn: "🔵 改为进行中",
       wd_edit_link: "编辑",
       wd_map_label: "地图上的作业范围",
-      app_loading_text: "正在加载..."
+      app_loading_text: "正在加载...",
+      worktype_suggest_label: "从该位置的其他作业中选取",
+      zone_select_placeholder: "请选择位置"
     },
     en: {
       manage_title: "Manage",
@@ -1287,7 +1298,9 @@ const db = getFirestore(fbApp);
       wd_reopen_btn: "🔵 Reopen (in progress)",
       wd_edit_link: "Edit",
       wd_map_label: "Work area on map",
-      app_loading_text: "Loading..."
+      app_loading_text: "Loading...",
+      worktype_suggest_label: "Load from another work at this location",
+      zone_select_placeholder: "Select a location"
     }
   };
 
@@ -1334,6 +1347,7 @@ const db = getFirestore(fbApp);
     safeCall(typeof updateRiskButtons === 'function' ? updateRiskButtons : null);
     safeCall(typeof updateStatusToggleBtn === 'function' ? updateStatusToggleBtn : null);
     safeCall(typeof updateAreaStatusText === 'function' ? updateAreaStatusText : null);
+    safeCall(typeof updateWorktypeSuggestions === 'function' ? updateWorktypeSuggestions : null);
     safeCall(typeof setAdminUI === 'function' ? setAdminUI : null);
   }
 
@@ -1419,7 +1433,7 @@ const db = getFirestore(fbApp);
       if(isAdmin) fileInput.click();
       return;
     }
-    openWorkModal(null, zones[0] ? zones[0].id : null);
+    openWorkModal(null, null);
   });
   $('tab-status').addEventListener('click', ()=>{
     openStatusPage();
@@ -1587,6 +1601,57 @@ const db = getFirestore(fbApp);
     populateDatalist('company-datalist', 'safetytop_recent_companies');
   }
 
+  // 같은 위치(구역)에 이미 등록된 다른 작업들의 "작업 내용"을 눌러서 바로 불러올 수 있게 해준다.
+  function updateWorktypeSuggestions(){
+    const box = $('worktype-suggest');
+    if(!box) return;
+    const zoneId = $('f-zone').value;
+    const others = zoneId ? markers.filter(m=>m.zoneId===zoneId && m.id!==editingId && m.workType) : [];
+    const uniqueTypes = [...new Set(others.map(m=>m.workType))].slice(0, 6);
+    box.innerHTML = '';
+    if(uniqueTypes.length === 0){ box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    const label = document.createElement('div');
+    label.className = 'hint-text';
+    label.style.marginTop = '0';
+    label.style.marginBottom = '6px';
+    label.style.fontWeight = '600';
+    label.textContent = t('worktype_suggest_label');
+    box.appendChild(label);
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.flexWrap = 'wrap';
+    row.style.gap = '6px';
+    uniqueTypes.forEach(wt=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'worktype-suggest-btn';
+      btn.textContent = wt;
+      btn.addEventListener('click', ()=>{ $('f-worktype').value = wt; });
+      row.appendChild(btn);
+    });
+    box.appendChild(row);
+  }
+  $('f-zone').addEventListener('change', updateWorktypeSuggestions);
+
+  // 시작/종료 시간: 클릭해서 초점을 준 뒤 숫자를 그대로 타이핑하면 자동으로 "09:00" 형태로 맞춰준다.
+  function attachTimeMask(input){
+    if(!input) return;
+    input.addEventListener('input', ()=>{
+      let digits = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+      input.value = digits.length >= 3 ? (digits.slice(0,2) + ':' + digits.slice(2)) : digits;
+    });
+    input.addEventListener('blur', ()=>{
+      const match = input.value.trim().match(/^(\d{1,2}):?(\d{2})$/);
+      if(!match) return;
+      const hh = String(Math.min(23, parseInt(match[1], 10))).padStart(2, '0');
+      const mm = String(Math.min(59, parseInt(match[2], 10))).padStart(2, '0');
+      input.value = hh + ':' + mm;
+    });
+  }
+  attachTimeMask($('f-time-start'));
+  attachTimeMask($('f-time-end'));
+
   // ---------------- initial loading overlay ----------------
   let appLoadingHidden = false;
   function hideAppLoadingOverlay(){
@@ -1610,8 +1675,38 @@ const db = getFirestore(fbApp);
       renderFullWorkList();
       renderStats();
       hideAppLoadingOverlay();
+      autoCompleteExpiredWorks();
     }, (err)=>{ console.error('works listen error', err); hideAppLoadingOverlay(); });
   }
+
+  // ---------------- 종료 시간이 지나면 자동 완료 처리 ----------------
+  // "시작~종료" 또는 종료 시간만 있는 경우, 그 시간이 지났는데 아직 "진행중"이면 자동으로 "완료"로 바꿔준다.
+  // 오늘 날짜를 보고 있을 때만 적용 (지난 날짜/미래 날짜 조회 중에는 건드리지 않음).
+  function parseEndTimeStr(timeStr){
+    if(!timeStr) return null;
+    const parts = String(timeStr).split('~');
+    const endPart = (parts.length > 1 ? parts[1] : parts[0]).trim();
+    const m = endPart.match(/^(\d{1,2}):(\d{2})$/);
+    if(!m) return null;
+    const h = parseInt(m[1], 10), mi = parseInt(m[2], 10);
+    if(h > 23 || mi > 59) return null;
+    return h * 60 + mi;
+  }
+  async function autoCompleteExpiredWorks(){
+    if(currentDate !== todayStr()) return;
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const targets = markers.filter(m=>{
+      if(m.status === 'done') return false;
+      const endMinutes = parseEndTimeStr(m.time);
+      return endMinutes !== null && endMinutes <= nowMinutes;
+    });
+    for(const m of targets){
+      try{ await updateDoc(doc(db,'works', m.id), { status: 'done' }); }
+      catch(e){ console.error('auto-complete failed', e); }
+    }
+  }
+  setInterval(autoCompleteExpiredWorks, 60000);
 
   // ---------------- site name ----------------
   let siteNameTimer;
@@ -2213,7 +2308,8 @@ const db = getFirestore(fbApp);
     function makePin(m, zone, pinX, pinY, areaForSize){
       const pinColor = companyColor(m.company);
       const pin = document.createElement('div');
-      pin.className = 'pin' + (m.risk === 'high' ? ' has-warn' : '');
+      const isDone = m.status === 'done';
+      pin.className = 'pin' + (m.risk === 'high' && !isDone ? ' has-warn' : '');
       pin.style.left = pinX + '%';
       pin.style.top = pinY + '%';
       let pinSizePx;
@@ -2226,7 +2322,7 @@ const db = getFirestore(fbApp);
         pinSizePx = Math.max(PIN_MIN_NOAREA_PX, Math.min(PIN_MAX_PX, canvasWpx * NO_AREA_PIN_RATIO));
       }
       pin.style.setProperty('--pin-size', pinSizePx.toFixed(1) + 'px');
-      const warnBadge = m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '';
+      const warnBadge = isDone ? `<div class="pin-warn pin-done-badge">✓</div>` : (m.risk === 'high' ? `<div class="pin-warn">⚠</div>` : '');
       const labelText = [m.company, zone ? zone.name : ''].filter(Boolean).join(' · ');
       pin.innerHTML = `<div class="pin-circle" style="background:${pinColor}">${m.people||0}</div>${warnBadge}<div class="pin-label">${escapeHTML(labelText || m.workType || t('work_fallback'))}</div>`;
       pin.addEventListener('click', (ev)=>{ ev.stopPropagation(); openWorkDetail(m.id); });
@@ -2522,6 +2618,11 @@ const db = getFirestore(fbApp);
     }
     $('zone-hint').style.display = 'none';
     sel.disabled = false;
+    const placeholderOpt = document.createElement('option');
+    placeholderOpt.value = '';
+    placeholderOpt.textContent = t('zone_select_placeholder');
+    if(!selectedId) placeholderOpt.selected = true;
+    sel.appendChild(placeholderOpt);
     zones.forEach(z=>{
       const opt = document.createElement('option');
       opt.value = z.id; opt.textContent = z.name;
@@ -2560,6 +2661,7 @@ const db = getFirestore(fbApp);
     updateAreaStatusText();
     $('delete-btn').style.display = (m && !duplicateFrom) ? 'block' : 'none';
     $('work-form-error').style.display = 'none';
+    updateWorktypeSuggestions();
     showWorkPage();
     setActiveTab('add-work');
   }
