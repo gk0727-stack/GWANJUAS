@@ -485,6 +485,15 @@
   .tab-btn:hover{ background:var(--panel-2); }
   .tab-btn.active{ color:var(--accent); }
 
+  /* ---------- Safety improvement report (안전개선신고) ---------- */
+  .report-list{ display:flex; flex-direction:column; gap:10px; }
+  .report-item{ display:flex; gap:12px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--panel); align-items:flex-start; }
+  .report-item img{ width:64px; height:64px; object-fit:cover; border-radius:8px; flex-shrink:0; background:var(--panel-2); }
+  .report-item .body{ flex:1; min-width:0; }
+  .report-item .content{ font-size:14px; color:var(--text); margin-bottom:4px; white-space:pre-wrap; word-break:break-word; }
+  .report-item .meta{ font-size:12px; color:var(--text-dim); }
+  .report-item .del-btn{ background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:18px; padding:4px; flex-shrink:0; }
+
   /* ---------- Management panel ---------- */
   .mgmt-actions{ display:flex; flex-direction:column; gap:9px; }
   .mgmt-actions .btn{ justify-content:flex-start; padding:14px 16px; font-size:15.5px; }
@@ -671,6 +680,11 @@
 
       <div class="field-row">
         <div class="field"><label data-i18n="label_people">투입 인원</label><input type="number" id="f-people" min="1" placeholder="0"></div>
+        <div class="field">
+          <label data-i18n="label_vulnerable">취약근로자</label>
+          <input type="number" id="f-vulnerable" min="0" placeholder="0">
+          <div class="hint-text" style="margin-top:5px;" data-i18n="vulnerable_hint">고령자·임산부 등</div>
+        </div>
       </div>
       <div class="field-row">
         <div class="field"><label data-i18n="label_time_start">시작 시간</label><input type="text" id="f-time-start" inputmode="numeric" placeholder="09:00" maxlength="5" autocomplete="off"></div>
@@ -712,6 +726,8 @@
         <button id="status-next-day" type="button" title="다음 날짜" data-i18n-title="next_day_title">›</button>
         <button id="status-date-today" type="button" class="status-date-today-btn" data-i18n="today_btn">오늘</button>
       </div>
+
+      <div class="hint-text" id="status-vulnerable-summary" style="margin-top:-4px; margin-bottom:12px; font-weight:600;"></div>
 
       <div class="export-row">
         <span class="export-label" data-i18n="export_label">📥 엑셀 내보내기</span>
@@ -768,6 +784,44 @@
     </div>
   </div>
 
+  <!-- 안전개선신고 (누구나 사진+내용으로 신고, 신고 내역은 관리자만 열람) -->
+  <div class="page-view" id="page-report" style="display:none;">
+    <div class="page-inner">
+      <div class="page-header">
+        <button class="page-back" id="report-page-back-btn" data-i18n="back">← 뒤로</button>
+        <h2 data-i18n="report_title">안전개선신고</h2>
+      </div>
+
+      <div class="hint-text" style="margin-top:0; margin-bottom:16px;" data-i18n="report_intro">현장의 위험한 상황이나 아차사고를 사진과 함께 신고해주세요. 신고 내용은 관리자만 확인합니다.</div>
+
+      <div class="field">
+        <label data-i18n="report_photo_label">사진</label>
+        <button type="button" class="btn" id="report-photo-btn" data-i18n="report_photo_btn">📷 사진 촬영 / 첨부</button>
+        <input type="file" id="report-photo-input" accept="image/*" capture="environment" style="display:none;">
+        <div id="report-photo-preview" style="display:none; margin-top:10px; max-width:260px;">
+          <img id="report-photo-img" style="width:100%; border-radius:10px; display:block;" alt="">
+          <button type="button" id="report-photo-remove" data-i18n="report_photo_remove" style="margin-top:6px; background:none; border:none; color:var(--high); font-weight:700; font-size:13px; cursor:pointer; padding:2px;">사진 삭제</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="report_content_label">신고 내용</label>
+        <textarea id="report-content" placeholder="예: 3층 비계 발판 일부 파손, 넘어질 뻔함" data-i18n-placeholder="report_content_ph"></textarea>
+      </div>
+
+      <div class="hint-text" id="report-form-error" style="display:none; font-weight:700;"></div>
+
+      <div class="modal-actions">
+        <button class="btn primary" id="report-submit-btn" style="width:100%; justify-content:center;" data-i18n="report_submit_btn">신고하기</button>
+      </div>
+
+      <div class="admin-only" id="report-list-section" style="display:none; margin-top:32px; padding-top:24px; border-top:1px solid var(--border);">
+        <h3 style="margin-bottom:14px;" data-i18n="report_list_title">📋 접수된 신고 내역 (관리자 전용)</h3>
+        <div id="report-list" class="report-list"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- 하단 탭바는 일부러 .dashboard-viewport(스크롤되는 컨테이너) 밖으로 뺐다.
@@ -788,6 +842,9 @@
   </button>
   <button class="tab-btn" id="tab-status">
     <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8 11h8M8 15h8M8 19h5"/></svg></span><span data-i18n="tab_status">작업현황</span>
+  </button>
+  <button class="tab-btn" id="tab-report">
+    <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span data-i18n="tab_report">안전신고</span>
   </button>
 </div>
 
@@ -1022,6 +1079,8 @@ const db = getFirestore(fbApp);
       draw_area_btn: "🗺️ 지도에서 범위 그리기",
       label_status: "작업 상태",
       label_people: "투입 인원",
+      label_vulnerable: "취약근로자",
+      vulnerable_hint: "고령자·임산부 등",
       label_time_start: "시작 시간",
       label_time_end: "종료 시간",
       label_company: "업체 / 팀명",
@@ -1049,6 +1108,7 @@ const db = getFirestore(fbApp);
       tab_dashboard: "대시보드",
       tab_add_work: "작업등록",
       tab_status: "작업현황",
+      tab_report: "안전신고",
       zone_name_title: "위치 이름 입력",
       label_name: "이름",
       zone_name_ph: "예: A동 3층, 타워크레인 구역",
@@ -1092,6 +1152,23 @@ const db = getFirestore(fbApp);
       merge_running: (count)=>`⏳ ${count}건 병합 중...`,
       merge_success: (count)=>`✅ ${count}건이 병합되었습니다.`,
       merge_error: "병합 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      status_vulnerable_total: (n)=>`오늘 취약근로자 총 ${n}명`,
+      report_title: "안전개선신고",
+      report_intro: "현장의 위험한 상황이나 아차사고를 사진과 함께 신고해주세요. 신고 내용은 관리자만 확인합니다.",
+      report_photo_label: "사진",
+      report_photo_btn: "📷 사진 촬영 / 첨부",
+      report_photo_remove: "사진 삭제",
+      report_content_label: "신고 내용",
+      report_content_ph: "예: 3층 비계 발판 일부 파손, 넘어질 뻔함",
+      report_submit_btn: "신고하기",
+      report_submitting: "🔄 신고 접수 중...",
+      report_photo_required: "⚠ 사진을 첨부해주세요.",
+      report_content_required: "⚠ 신고 내용을 입력해주세요.",
+      report_submit_success: "✅ 신고가 접수되었습니다. 확인 감사합니다.",
+      report_submit_error: "❌ 신고 접수에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      report_list_title: "📋 접수된 신고 내역 (관리자 전용)",
+      report_list_empty: "아직 접수된 신고가 없습니다.",
+      report_delete_confirm: "이 신고 내역을 삭제할까요?",
       dayclose_btn: "🌙  하루 마감",
       dayclose_confirm: (count,date)=>`${date} 날짜의 진행중인 작업 ${count}건을 모두 완료 처리합니다.\n계속할까요?`,
       dayclose_none: "진행중인 작업이 없습니다.",
@@ -1144,6 +1221,7 @@ const db = getFirestore(fbApp);
       wd_company: "업체 / 팀명",
       wd_supervisor: "감시단 / 안전담당자",
       wd_people: "투입 인원",
+      wd_vulnerable: "취약근로자",
       wd_time: "시간",
       wd_note: "메모",
       wd_complete_btn: "✅ 작업완료 처리",
@@ -1194,6 +1272,8 @@ const db = getFirestore(fbApp);
       draw_area_btn: "🗺️ 在地图上绘制范围",
       label_status: "作业状态",
       label_people: "投入人数",
+      label_vulnerable: "弱势工人",
+      vulnerable_hint: "老年人·孕妇等",
       label_time_start: "开始时间",
       label_time_end: "结束时间",
       label_company: "公司 / 团队名称",
@@ -1221,6 +1301,7 @@ const db = getFirestore(fbApp);
       tab_dashboard: "仪表盘",
       tab_add_work: "登记作业",
       tab_status: "作业现况",
+      tab_report: "安全举报",
       zone_name_title: "输入位置名称",
       label_name: "姓名",
       zone_name_ph: "例：A栋3楼，塔吊区域",
@@ -1264,6 +1345,23 @@ const db = getFirestore(fbApp);
       merge_running: (count)=>`⏳ 正在合并${count}件...`,
       merge_success: (count)=>`✅ 已合并${count}件。`,
       merge_error: "合并过程中发生错误,请稍后再试。",
+      status_vulnerable_total: (n)=>`今日弱势工人共 ${n}人`,
+      report_title: "安全改善举报",
+      report_intro: "请拍照举报现场的危险情况或未遂事故。举报内容仅管理员可查看。",
+      report_photo_label: "照片",
+      report_photo_btn: "📷 拍照 / 上传照片",
+      report_photo_remove: "删除照片",
+      report_content_label: "举报内容",
+      report_content_ph: "例：3楼脚手架平台部分损坏,险些摔倒",
+      report_submit_btn: "提交举报",
+      report_submitting: "🔄 正在提交举报...",
+      report_photo_required: "⚠ 请附上照片。",
+      report_content_required: "⚠ 请输入举报内容。",
+      report_submit_success: "✅ 举报已提交,感谢您的反馈。",
+      report_submit_error: "❌ 举报提交失败,请稍后重试。",
+      report_list_title: "📋 举报记录(仅管理员)",
+      report_list_empty: "暂无举报记录。",
+      report_delete_confirm: "确定要删除这条举报记录吗?",
       dayclose_btn: "🌙  结束当日",
       dayclose_confirm: (count,date)=>`将${date}的${count}件进行中作业全部标记为完成。\n是否继续?`,
       dayclose_none: "没有进行中的作业。",
@@ -1316,6 +1414,7 @@ const db = getFirestore(fbApp);
       wd_company: "企业 / 团队名",
       wd_supervisor: "监视组 / 安全负责人",
       wd_people: "投入人数",
+      wd_vulnerable: "弱势工人",
       wd_time: "时间",
       wd_note: "备注",
       wd_complete_btn: "✅ 标记为完成",
@@ -1366,6 +1465,8 @@ const db = getFirestore(fbApp);
       draw_area_btn: "🗺️ Draw area on map",
       label_status: "Work status",
       label_people: "Workers assigned",
+      label_vulnerable: "Vulnerable workers",
+      vulnerable_hint: "e.g. elderly, pregnant workers",
       label_time_start: "Start time",
       label_time_end: "End time",
       label_company: "Company / team",
@@ -1393,6 +1494,7 @@ const db = getFirestore(fbApp);
       tab_dashboard: "Dashboard",
       tab_add_work: "Add work",
       tab_status: "Status",
+      tab_report: "Report",
       zone_name_title: "Enter location name",
       label_name: "Name",
       zone_name_ph: "e.g. Building A 3F, Tower crane area",
@@ -1436,6 +1538,23 @@ const db = getFirestore(fbApp);
       merge_running: (count)=>`⏳ Merging ${count} records...`,
       merge_success: (count)=>`✅ Merged ${count} records.`,
       merge_error: "An error occurred while merging. Please try again.",
+      status_vulnerable_total: (n)=>`Vulnerable workers today: ${n}`,
+      report_title: "Safety Improvement Report",
+      report_intro: "Report hazards or near-misses on site with a photo. Only admins can view submitted reports.",
+      report_photo_label: "Photo",
+      report_photo_btn: "📷 Take / Attach Photo",
+      report_photo_remove: "Remove photo",
+      report_content_label: "Report details",
+      report_content_ph: "e.g. Loose scaffold plank on 3F, nearly fell",
+      report_submit_btn: "Submit report",
+      report_submitting: "🔄 Submitting report...",
+      report_photo_required: "⚠ Please attach a photo.",
+      report_content_required: "⚠ Please enter the report details.",
+      report_submit_success: "✅ Report submitted. Thank you.",
+      report_submit_error: "❌ Failed to submit report. Please try again.",
+      report_list_title: "📋 Submitted reports (admin only)",
+      report_list_empty: "No reports submitted yet.",
+      report_delete_confirm: "Delete this report?",
       dayclose_btn: "🌙  Close out day",
       dayclose_confirm: (count,date)=>`Mark all ${count} in-progress work items on ${date} as done.\nContinue?`,
       dayclose_none: "There are no in-progress work items.",
@@ -1488,6 +1607,7 @@ const db = getFirestore(fbApp);
       wd_company: "Company / Team",
       wd_supervisor: "Safety officer",
       wd_people: "Workers",
+      wd_vulnerable: "Vulnerable workers",
       wd_time: "Time",
       wd_note: "Note",
       wd_complete_btn: "✅ Mark as complete",
@@ -1582,6 +1702,9 @@ const db = getFirestore(fbApp);
         $('empty-desc').textContent = t('empty_desc_noadmin');
       }
     }
+    // 안전개선신고 내역은 관리자에게만 보여야 해서, 관리자 모드가 켜지고/꺼질
+    // 때마다 목록을 다시 그려준다(꺼질 때는 내용까지 비워서 DOM에 남지 않게 함).
+    if(typeof renderReportList === 'function') renderReportList();
   }
 
   const adminPinBackdrop = $('admin-pin-backdrop');
@@ -1620,6 +1743,7 @@ const db = getFirestore(fbApp);
     $('tab-dashboard').classList.toggle('active', tab==='dashboard');
     $('tab-add-work').classList.toggle('active', tab==='add-work');
     $('tab-status').classList.toggle('active', tab==='status');
+    $('tab-report').classList.toggle('active', tab==='report');
     $('tab-manage').classList.toggle('active', tab==='manage');
   }
   $('tab-dashboard').addEventListener('click', ()=>{
@@ -1636,6 +1760,9 @@ const db = getFirestore(fbApp);
   });
   $('tab-status').addEventListener('click', ()=>{
     openStatusPage();
+  });
+  $('tab-report').addEventListener('click', ()=>{
+    openReportPage();
   });
   $('tab-manage').addEventListener('click', ()=>{
     setActiveTab('manage');
@@ -1853,6 +1980,14 @@ const db = getFirestore(fbApp);
       staffList = snap.docs.map(d=>({ id: d.id, ...d.data() }));
       renderStaffPageList();
     }, (err)=>{ console.error('staff listen error', err); });
+
+    // 안전개선신고(hazard_reports) collection, realtime — 목록 렌더링은
+    // renderReportList() 내부에서 isAdmin일 때만 실제로 DOM에 채워진다.
+    onSnapshot(collection(db, 'hazard_reports'), (snap)=>{
+      hazardReports = snap.docs.map(d=>({ id: d.id, ...d.data() }))
+        .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+      renderReportList();
+    }, (err)=>{ console.error('hazard reports listen error', err); });
 
     subscribeWorks(currentDate);
 
@@ -2575,6 +2710,165 @@ const db = getFirestore(fbApp);
     });
   }
 
+  // ---------------- 안전개선신고 (누구나 사진+내용으로 신고, 신고 내역은 관리자만 열람) ----------------
+  // 이 앱은 Firestore 보안규칙이 아니라 클라이언트 쪽 PIN(관리자 모드)으로만
+  // 관리자/일반 사용자를 구분한다(다른 관리자 기능들과 동일한 방식, 진짜
+  // 보안이 아니라는 점은 ADMIN_PIN 주석 참고). 그래서 신고 데이터 자체는
+  // 모든 기기가 동일하게 실시간 구독하지만, 화면에 실제로 그려주는(DOM에
+  // 채워넣는) 것은 isAdmin일 때만 하도록 해서 일반 사용자 화면/개발자도구에
+  // 신고 내용이 노출되지 않게 한다.
+  let hazardReports = [];
+  let reportPhotoDataURL = null;
+
+  const reportPhotoInput = $('report-photo-input');
+  const reportPhotoPreview = $('report-photo-preview');
+  const reportPhotoImg = $('report-photo-img');
+  const reportContentInput = $('report-content');
+  const reportFormError = $('report-form-error');
+  const reportSubmitBtn = $('report-submit-btn');
+
+  function openReportPage(){
+    closeAllPages();
+    mainArea.style.display = 'none';
+    reportPage.style.display = 'block';
+    setActiveTab('report');
+    resetReportForm();
+    renderReportList();
+  }
+  $('report-page-back-btn').addEventListener('click', ()=>{ closeAllPages(); setActiveTab('dashboard'); });
+
+  function resetReportForm(){
+    reportPhotoDataURL = null;
+    reportPhotoInput.value = '';
+    reportPhotoPreview.style.display = 'none';
+    reportPhotoImg.src = '';
+    reportContentInput.value = '';
+    reportFormError.style.display = 'none';
+  }
+
+  $('report-photo-btn').addEventListener('click', ()=> reportPhotoInput.click());
+  $('report-photo-remove').addEventListener('click', ()=>{
+    reportPhotoDataURL = null;
+    reportPhotoInput.value = '';
+    reportPhotoPreview.style.display = 'none';
+  });
+
+  reportPhotoInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onerror = ()=>{
+      reportFormError.style.color = 'var(--high)';
+      reportFormError.textContent = '❌ 파일을 읽을 수 없습니다. 다시 시도해주세요.';
+      reportFormError.style.display = 'block';
+    };
+    reader.onload = (ev)=>{
+      const img = new Image();
+      img.onerror = ()=>{
+        reportFormError.style.color = 'var(--high)';
+        reportFormError.textContent = '❌ 이 이미지 형식은 지원되지 않습니다. JPG/PNG로 다시 시도해주세요.';
+        reportFormError.style.display = 'block';
+      };
+      img.onload = ()=>{
+        let quality = 0.7, maxW = 1000;
+        let dataURL = compress(img, maxW, quality);
+        let guard = 0;
+        while(dataURL.length > 500000 && guard < 25){
+          if(quality > 0.3) quality -= 0.08; else maxW = Math.max(300, maxW - 150);
+          dataURL = compress(img, maxW, quality);
+          guard++;
+        }
+        reportPhotoDataURL = dataURL;
+        reportPhotoImg.src = dataURL;
+        reportPhotoPreview.style.display = 'block';
+        reportFormError.style.display = 'none';
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  reportSubmitBtn.addEventListener('click', async ()=>{
+    const content = reportContentInput.value.trim();
+    if(!reportPhotoDataURL){
+      reportFormError.style.color = 'var(--high)';
+      reportFormError.textContent = t('report_photo_required');
+      reportFormError.style.display = 'block';
+      return;
+    }
+    if(!content){
+      reportFormError.style.color = 'var(--high)';
+      reportFormError.textContent = t('report_content_required');
+      reportFormError.style.display = 'block';
+      reportContentInput.focus();
+      return;
+    }
+    reportFormError.style.display = 'none';
+    reportSubmitBtn.disabled = true;
+    const prevText = reportSubmitBtn.textContent;
+    reportSubmitBtn.textContent = t('report_submitting');
+    try{
+      await Promise.race([
+        addDoc(collection(db,'hazard_reports'), {
+          photo: reportPhotoDataURL,
+          content,
+          createdAt: Date.now()
+        }),
+        new Promise((_, reject)=> setTimeout(()=> reject(new Error('TIMEOUT')), 15000))
+      ]);
+      resetReportForm();
+      reportFormError.style.color = 'var(--accent)';
+      reportFormError.textContent = t('report_submit_success');
+      reportFormError.style.display = 'block';
+    }catch(err){
+      console.error('report submit failed', err);
+      reportFormError.style.color = 'var(--high)';
+      reportFormError.textContent = t('report_submit_error');
+      reportFormError.style.display = 'block';
+    }finally{
+      reportSubmitBtn.disabled = false;
+      reportSubmitBtn.textContent = prevText;
+    }
+  });
+
+  function renderReportList(){
+    const list = $('report-list');
+    if(!list) return;
+    if(!isAdmin){
+      list.innerHTML = '';
+      return;
+    }
+    if(hazardReports.length === 0){
+      list.innerHTML = `<div class="status-empty">${t('report_list_empty')}</div>`;
+      return;
+    }
+    list.innerHTML = hazardReports.map(r=>{
+      const dt = r.createdAt ? new Date(r.createdAt).toLocaleString('ko-KR') : '';
+      return `<div class="report-item" data-id="${r.id}">
+        ${r.photo ? `<img src="${r.photo}" alt="">` : ''}
+        <div class="body">
+          <div class="content">${escapeHTML(r.content||'')}</div>
+          <div class="meta">${escapeHTML(dt)}</div>
+        </div>
+        <button type="button" class="del-btn" data-act="delete-report" title="${t('title_delete')}">🗑️</button>
+      </div>`;
+    }).join('');
+  }
+
+  $('report-list').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-act="delete-report"]');
+    if(!btn) return;
+    const item = e.target.closest('.report-item');
+    const id = item && item.dataset.id;
+    if(!id) return;
+    requireAdmin(async ()=>{
+      if(!confirm(t('report_delete_confirm'))) return;
+      try{
+        await deleteDoc(doc(db,'hazard_reports',id));
+      }catch(err){ console.error('report delete failed', err); }
+    });
+  });
+
   // 작업등록 화면의 감시단/안전담당자 체크리스트: 안전관리자·안전감시단 / 관리감독자 2개 탭으로 구분.
   // 안전보건총괄책임자는 여기서는 선택 대상에서 제외한다.
   const STAFF_CHECKLIST_ROLE_GROUPS = {
@@ -2846,6 +3140,7 @@ const db = getFirestore(fbApp);
       wdRow(t('wd_company'), companyHtml),
       wdRow(t('wd_supervisor'), m.supervisor ? escapeHTML(m.supervisor) : ''),
       wdRow(t('wd_people'), (m.people || m.people === 0) ? `${m.people}${t('unit_people')}` : ''),
+      wdRow(t('wd_vulnerable'), (m.vulnerable) ? `${m.vulnerable}${t('unit_people')}` : ''),
       wdRow(t('wd_time'), m.time ? escapeHTML(m.time) : ''),
       wdRow(t('wd_note'), m.note ? escapeHTML(m.note) : '')
     ].filter(Boolean).join('');
@@ -2983,12 +3278,14 @@ const db = getFirestore(fbApp);
   // ---------------- page switching (dashboard / work add-edit / status) ----------------
   const workPage = $('page-add-work');
   const statusPage = $('page-status');
+  const reportPage = $('page-report');
   const mainArea = document.querySelector('.main');
 
   function closeAllPages(){
     workPage.style.display = 'none';
     statusPage.style.display = 'none';
     staffPage.style.display = 'none';
+    reportPage.style.display = 'none';
     // .main 은 CSS에서 항상 display:grid 로 제어된다(데스크톱/모바일 각각
     // grid-template-areas가 다름). 예전에는 flex 레이아웃이어서 여기서
     // 'flex'로 되돌렸었는데, Grid로 바꾼 뒤에도 이 줄이 안 바뀌어서
@@ -3035,6 +3332,7 @@ const db = getFirestore(fbApp);
     populateZoneSelect(m ? m.zoneId : presetZoneId);
     $('f-worktype').value = m ? m.workType : '';
     $('f-people').value = m ? m.people : '';
+    $('f-vulnerable').value = (m && m.vulnerable) ? m.vulnerable : '';
     if(m && m.time && m.time.includes('~')){
       const [ts, te] = m.time.split('~').map(s=>s.trim());
       $('f-time-start').value = ts || '';
@@ -3093,6 +3391,10 @@ const db = getFirestore(fbApp);
   function renderStatusList(){
     const list = $('status-list');
     list.innerHTML = '';
+
+    const vulnerableTotal = markers.reduce((s,m)=> s + (Number(m.vulnerable)||0), 0);
+    const summaryEl = $('status-vulnerable-summary');
+    if(summaryEl) summaryEl.textContent = t('status_vulnerable_total')(vulnerableTotal);
 
     const matches = (m)=>{
       if(statusRiskFilter !== 'all' && m.risk !== statusRiskFilter) return false;
@@ -3203,6 +3505,7 @@ const db = getFirestore(fbApp);
           '작업 내용': m.workType || '',
           '위험도': riskLabel(m.risk),
           '인원': m.people || 0,
+          '취약근로자': m.vulnerable || 0,
           '시간': m.time || '',
           '업체': m.company || '',
           '감시단/안전담당자': m.supervisor || '',
@@ -3392,6 +3695,7 @@ const db = getFirestore(fbApp);
     const zoneId = $('f-zone').value;
     const workType = $('f-worktype').value.trim();
     const people = Number($('f-people').value) || 0;
+    const vulnerable = Number($('f-vulnerable').value) || 0;
     const timeStart = $('f-time-start').value;
     const timeEnd = $('f-time-end').value;
     const time = timeStart && timeEnd ? `${timeStart}~${timeEnd}` : (timeStart || timeEnd || '');
@@ -3419,10 +3723,10 @@ const db = getFirestore(fbApp);
 
     try{
       if(editingId){
-        await updateDoc(doc(db,'works',editingId), { zoneId, workType, people, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk });
+        await updateDoc(doc(db,'works',editingId), { zoneId, workType, people, vulnerable, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk });
       } else {
         await addDoc(collection(db,'works'), {
-          date: currentDate, zoneId, workType, people, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk, createdAt: Date.now()
+          date: currentDate, zoneId, workType, people, vulnerable, time, company, supervisor, note, areas, area: null, status, risk: selectedRisk, createdAt: Date.now()
         });
       }
       pushRecentValue('safetytop_recent_worktypes', workType);
