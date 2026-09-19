@@ -163,14 +163,14 @@
   .btn:disabled{ opacity:0.4; cursor:not-allowed; }
 
   /* ---------- Stats strip ---------- */
-  .stats{ grid-area:stats; display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .stats{ grid-area:stats; display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
   .stat-card{
-    background:var(--panel); padding:8px 10px; display:flex; flex-direction:column; gap:1px;
+    background:var(--panel); padding:8px 6px; display:flex; flex-direction:column; gap:1px;
     transform:translateZ(0); -webkit-transform:translateZ(0);
     isolation:isolate; contain:paint;
   }
-  .stat-card .num{ font-size:18px; font-weight:800; letter-spacing:-0.3px; line-height:1.1; color:var(--text); }
-  .stat-card .label{ font-size:10.5px; color:var(--text-muted); font-weight:600; }
+  .stat-card .num{ font-size:16px; font-weight:800; letter-spacing:-0.3px; line-height:1.1; color:var(--text); }
+  .stat-card .label{ font-size:9.5px; color:var(--text-muted); font-weight:600; }
   .stat-card.high .num{ color:var(--high); }
   .stat-card.mid .num{ color:var(--mid); }
   .stat-card.low .num{ color:var(--low); }
@@ -620,6 +620,7 @@
       <div class="stat-card high"><div class="num" id="stat-high-people">0</div><div class="label" data-i18n="stat_high_people">고위험 작업 인원</div></div>
       <div class="stat-card"><div class="num" id="stat-total-works">0</div><div class="label" data-i18n="stat_total_works">전체 작업 건수</div></div>
       <div class="stat-card high"><div class="num" id="stat-high">0</div><div class="label" data-i18n="stat_high">고위험 건수</div></div>
+      <div class="stat-card"><div class="num" id="stat-vulnerable-people">0</div><div class="label" data-i18n="stat_vulnerable_people">취약근로자 인원</div></div>
     </div>
 
     <div class="sidebar">
@@ -683,7 +684,7 @@
         <div class="field">
           <label data-i18n="label_vulnerable">취약근로자</label>
           <input type="number" id="f-vulnerable" min="0" placeholder="0">
-          <div class="hint-text" style="margin-top:5px;" data-i18n="vulnerable_hint">고령자·임산부 등</div>
+          <div class="hint-text" style="margin-top:5px;" data-i18n="vulnerable_hint">고령자, 기저질환자 등</div>
         </div>
       </div>
       <div class="field-row">
@@ -1062,6 +1063,7 @@ const db = getFirestore(fbApp);
       stat_high_people: "고위험 작업 인원",
       stat_total_works: "전체 작업 건수",
       stat_high: "고위험 건수",
+      stat_vulnerable_people: "취약근로자 인원",
       stat_mid: "중위험 건수",
       stat_low: "저위험 건수",
       back: "← 뒤로",
@@ -1080,7 +1082,7 @@ const db = getFirestore(fbApp);
       label_status: "작업 상태",
       label_people: "투입 인원",
       label_vulnerable: "취약근로자",
-      vulnerable_hint: "고령자·임산부 등",
+      vulnerable_hint: "고령자, 기저질환자 등",
       label_time_start: "시작 시간",
       label_time_end: "종료 시간",
       label_company: "업체 / 팀명",
@@ -1255,6 +1257,7 @@ const db = getFirestore(fbApp);
       stat_high_people: "高风险作业人数",
       stat_total_works: "全部作业件数",
       stat_high: "高风险件数",
+      stat_vulnerable_people: "弱势工人人数",
       stat_mid: "中风险件数",
       stat_low: "低风险件数",
       back: "← 返回",
@@ -1273,7 +1276,7 @@ const db = getFirestore(fbApp);
       label_status: "作业状态",
       label_people: "投入人数",
       label_vulnerable: "弱势工人",
-      vulnerable_hint: "老年人·孕妇等",
+      vulnerable_hint: "老年人、有基础疾病者等",
       label_time_start: "开始时间",
       label_time_end: "结束时间",
       label_company: "公司 / 团队名称",
@@ -1448,6 +1451,7 @@ const db = getFirestore(fbApp);
       stat_high_people: "High-risk work workers",
       stat_total_works: "Total work items",
       stat_high: "High-risk count",
+      stat_vulnerable_people: "Vulnerable workers",
       stat_mid: "Mid-risk count",
       stat_low: "Low-risk count",
       back: "← Back",
@@ -1466,7 +1470,7 @@ const db = getFirestore(fbApp);
       label_status: "Work status",
       label_people: "Workers assigned",
       label_vulnerable: "Vulnerable workers",
-      vulnerable_hint: "e.g. elderly, pregnant workers",
+      vulnerable_hint: "e.g. elderly, workers with pre-existing conditions",
       label_time_start: "Start time",
       label_time_end: "End time",
       label_company: "Company / team",
@@ -3273,6 +3277,7 @@ const db = getFirestore(fbApp);
     $('stat-high-people').textContent = highPeople;
     $('stat-total-works').textContent = markers.length;
     $('stat-high').textContent = markers.filter(m=>m.risk==='high').length;
+    $('stat-vulnerable-people').textContent = markers.reduce((s,m)=>s+(Number(m.vulnerable)||0),0);
   }
 
   // ---------------- page switching (dashboard / work add-edit / status) ----------------
